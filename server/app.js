@@ -1,9 +1,11 @@
 import cookieParser from "cookie-parser";
+import { config } from "dotenv";
 import cors from 'cors'
 import express from "express";
 import morgan from "morgan";
+import userRoutes from './routes/userRoutes.js'
 const app = express();
-
+config()
 app.use(
   cors({
     origin: [process.env.FRONTEND_URI],
@@ -14,6 +16,9 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan("dev"));
+
+
+app.use('/api/v1/user',userRoutes)
 
 app.all("*", (req, res) => {
   res.status(404).send("OOPS! Page Not Found!!");
