@@ -4,10 +4,10 @@ import HomePage from "./Pages/HomePage";
 import "aos/dist/aos.css"; // This import is crucial to include AOS styles
 import Signup from "./Pages/Signup";
 import { Route, Routes } from "react-router-dom";
-import VegetablesPage from "./Pages/VegetablePage";
+import VegetablesPage from "./Pages/Products/VegetablePage";
 import CartPage from "./Pages/CartPage";
-import FruitsPage from "./Pages/FruitsPage";
-import GrainsPage from "./Pages/GrainsPage";
+import FruitsPage from "./Pages/Products/FruitsPage";
+import GrainsPage from "./Pages/Products/GrainsPage";
 import ContactUs from "./Pages/ContactUs";
 import ProductPage from "./Pages/ProductPage";
 import AboutUs from "./Pages/AboutUs";

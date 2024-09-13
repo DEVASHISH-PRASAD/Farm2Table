@@ -1,26 +1,30 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import AOS from "aos";
-import tomatoImg from "../assets/tomatoImg.jpeg";
-import potatoImg from "../assets/potatoImg.png";
-import carrotImg from "../assets/carrotImg.jpeg";
-import onionImg from "../assets/onionImg.png";
-import spinachImg from "../assets/spinachImg.jpeg";
-import capsicumImg from "../assets/capsicumImg.jpg"
+import appleImg from "../../assets/appleImg.png";
+import bananaImg from "../../assets/bananaImg.png";
+import grapeImg from "../../assets/grapeImg.png";
+import mangoImg from "../../assets/mangoImg.png";
+import orangeImg from "../../assets/orangeImg.png";
+import cherryImg from "../../assets/cherryImg.png";
+import dragonImg from "../../assets/dragonImg.png";
+import kiwiImg from "../../assets/Kiwi.png";
 import { IoCartOutline } from "react-icons/io5";
-import Footer from "../Pages/Footer";
+import Footer from "../Footer";
 import toast from "react-hot-toast";
 
-const vegetablesData = [
-  { src: tomatoImg, name: "Tomato", msp: "₹20/kg" },
-  { src: potatoImg, name: "Potato", msp: "₹15/kg" },
-  { src: carrotImg, name: "Carrot", msp: "₹30/kg" },
-  { src: onionImg, name: "Onion", msp: "₹25/kg" },
-  { src: spinachImg, name: "Spinach", msp: "₹10/bundle" },
-  {src: capsicumImg, name: "Capsicum", msp: "₹180/kg"}
+const fruitsData = [
+  { src: appleImg, name: "Apple", msp: "₹100/kg" },
+  { src: bananaImg, name: "Banana", msp: "₹40/dozen" },
+  { src: grapeImg, name: "Grapes", msp: "₹150/kg" },
+  { src: mangoImg, name: "Mango", msp: "₹200/kg" },
+  { src: orangeImg, name: "Orange", msp: "₹80/kg" },
+  { src: cherryImg, name: "Strawberry", msp: "₹100/kg" },
+  { src: dragonImg, name: "Dragon Fruit", msp: "₹140/piece" },
+  { src: kiwiImg, name: "Kiwi", msp: "₹40/piece" },
 ];
 
-const VegetablesPage = () => {
+const FruitsPage = () => {
   const [weights, setWeights] = useState({});
   const [cartCount, setCartCount] = useState(0);
   const [errors, setErrors] = useState({});
@@ -74,6 +78,11 @@ const VegetablesPage = () => {
   const handleAddToCart = (name) => {
     const weight = weights[name] || 0;
 
+    if (weight <= 0) {
+      toast.error(`Please enter a valid weight for ${name}`);
+      return;
+    }
+
     // Add item to localStorage
     const currentCart = JSON.parse(localStorage.getItem("cartItems")) || [];
     const itemIndex = currentCart.findIndex((item) => item.name === name);
@@ -86,7 +95,7 @@ const VegetablesPage = () => {
       currentCart.push({
         name,
         weight,
-        msp: vegetablesData.find((veg) => veg.name === name).msp,
+        msp: fruitsData.find((fruit) => fruit.name === name).msp,
       });
     }
 
@@ -101,6 +110,12 @@ const VegetablesPage = () => {
     );
     setCartCount(totalCount);
 
+    // Reset weight for the specific fruit
+    setWeights((prevWeights) => ({
+      ...prevWeights,
+      [name]: "",
+    }));
+
     toast.success(`Added ${weight}kg of ${name} to the cart!`);
   };
 
@@ -108,7 +123,7 @@ const VegetablesPage = () => {
     <div className="min-h-screen bg-gray-100">
       <header className="bg-[#004526] text-white px-4 py-3">
         <div className="container mx-auto px-4 flex justify-between items-center">
-          <h1 className="text-2xl md:text-4xl font-bold">Vegetables</h1>
+          <h1 className="text-2xl md:text-4xl font-bold">Fruits</h1>
           <div className="flex items-center space-x-4">
             <Link
               to="/"
@@ -137,34 +152,31 @@ const VegetablesPage = () => {
           className="md:text-3xl font-semibold mb-6 bg-gray-100"
           onChange={handleRoleChange}
         >
-          <option value="Organic Vegetables" className="text-base ">
-            Organic Vegetables
-          </option>
           <option value="/fruits" className="text-base ">
-            Fruits
+            Fresh Fruits
+          </option>
+          <option value="/vegetable" className="text-base ">
+            Vegetables
           </option>
           <option value="/grains" className="text-base ">
             Grains
           </option>
         </select>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {vegetablesData.map((vegetable, index) => (
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+          {fruitsData.map((fruit, index) => (
             <div
               key={index}
               className="card bg-white shadow-lg p-4 flex flex-col items-center"
             >
               <figure className="w-full mb-4">
                 <img
-                  src={vegetable.src}
-                  style={{height:"180px",width:"180px"}}
-                  alt={vegetable.name}
-                  className="w-full h-32 md:h-48 object-cover hover:scale-125 transition-all ease-in-out duration-300"
+                  src={fruit.src}
+                  alt={fruit.name}
+                  className="w-38 h-32 md:h-48 object-cover hover:scale-125 transition-all ease-in-out duration-300"
                 />
               </figure>
-              <h3 className="text-lg font-semibold">{vegetable.name}</h3>
-              <p className="text-sm text-gray-700 mt-2">
-                Price : {vegetable.msp}
-              </p>
+              <h3 className="text-lg font-semibold">{fruit.name}</h3>
+              <p className="text-sm text-gray-700 mt-2">Price : {fruit.msp}</p>
 
               {/* Weight Input */}
               <div className="mt-4 flex items-center w-full">
@@ -173,10 +185,9 @@ const VegetablesPage = () => {
                   min="1"
                   max="10"
                   step="0.5"
-                  placeholder="Weight"
-                  value={weights[vegetable.name] || ""}
+                  value={weights[fruit.name] || ""}
                   onChange={(e) =>
-                    handleWeightChange(vegetable.name, e.target.value)
+                    handleWeightChange(fruit.name, e.target.value)
                   }
                   className="flex-1 p-2 border border-gray-300 rounded-l"
                 />
@@ -184,15 +195,15 @@ const VegetablesPage = () => {
                   Kg
                 </span>
               </div>
-              {errors[vegetable.name] && (
+              {errors[fruit.name] && (
                 <p className="text-red-500 text-sm mt-1">
-                  {errors[vegetable.name]}
+                  {errors[fruit.name]}
                 </p>
               )}
 
               {/* Add to Cart Button */}
               <button
-                onClick={() => handleAddToCart(vegetable.name)}
+                onClick={() => handleAddToCart(fruit.name)}
                 className="mt-4 bg-[#ffdc00] text-black px-4 py-3 rounded-full hover:bg-[#ffd700] hover:scale-110 transition-all duration-200"
               >
                 Add to Cart
@@ -215,4 +226,4 @@ const VegetablesPage = () => {
   );
 };
 
-export default VegetablesPage;
+export default FruitsPage;

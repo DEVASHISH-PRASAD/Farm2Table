@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import farm from "../assets/logo.png";
 import { Link, useNavigate } from "react-router-dom";
 import Footer from "./Footer";
+import toast from "react-hot-toast";
 
 const CartPage = () => {
   const [cartItems, setCartItems] = useState([]);
@@ -20,11 +21,15 @@ const CartPage = () => {
   };
 
   const handleQuantityChange = (name, newWeight) => {
+    if(newWeight>10){
+      toast.error("Value must be in range 1 to 10")
+    }else{
     const updatedCartItems = cartItems.map((item) =>
       item.name === name ? { ...item, weight: newWeight } : item
     );
     localStorage.setItem("cartItems", JSON.stringify(updatedCartItems));
     setCartItems(updatedCartItems);
+  }
   };
 
   const calculateTotalCost = () => {
@@ -63,7 +68,7 @@ const CartPage = () => {
             <div
               key={index}
               className="card bg-white shadow-lg p-4 flex flex-col justify-between"
-              style={{ height: "300px", width:"200px" }} // Ensure cards have a consistent height
+              style={{ height: "300px", width:"200px" }} 
             >
               <h3 className="text-lg font-semibold mb-2">{item.name}</h3>
               <p className="text-sm text-gray-700 mb-2">MSP: {item.msp}</p>
@@ -73,7 +78,8 @@ const CartPage = () => {
                   type="number"
                   min="0"
                   step="0.5"
-                  value={item.weight || ""}
+                  max='10'
+                  value={item.weight<=10?item.weight:"" || ""}
                   onChange={(e) =>
                     handleQuantityChange(item.name, parseFloat(e.target.value))
                   }
