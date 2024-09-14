@@ -12,12 +12,14 @@ import ContactUs from "./Pages/ContactUs";
 import ProductPage from "./Pages/ProductPage";
 import AboutUs from "./Pages/AboutUs";
 import LoginPage from "./Pages/LoginPage";
+import Dashboard from "./Pages/User/Dashboard";
 
 function App() {
   return (
     <>
       <Routes>
         <Route path="/" element={<HomePage />}></Route>
+        <Route path="/dashboard" element={<Dashboard/>}></Route>
         <Route path="/aboutUs" element={<AboutUs />}></Route>
         <Route path="/products" element={<ProductPage />}></Route>
         <Route path="/contactUs" element={<ContactUs />}></Route>
