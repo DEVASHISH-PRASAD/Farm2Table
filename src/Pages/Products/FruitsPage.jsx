@@ -8,7 +8,7 @@ import mangoImg from "../../assets/mangoImg.png";
 import orangeImg from "../../assets/orangeImg.png";
 import cherryImg from "../../assets/cherryImg.png";
 import dragonImg from "../../assets/dragonImg.png";
-import kiwiImg from "../../assets/Kiwi.png";
+import kiwiImg from "../../assets/kiwi.png";
 import { IoCartOutline } from "react-icons/io5";
 import Footer from "../Footer";
 import toast from "react-hot-toast";
