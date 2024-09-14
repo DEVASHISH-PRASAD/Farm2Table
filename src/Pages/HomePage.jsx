@@ -320,19 +320,19 @@ const HomePage = () => {
               Quick Links
             </h4>
             <a
-              href="#about"
+              href="/aboutUs"
               className="text-sm md:text-base hover:text-gray-200"
             >
               About Us
             </a>
             <a
-              href="#products"
+              href="/products"
               className="text-sm md:text-base hover:text-gray-200"
             >
               Products
             </a>
             <a
-              href="#contact"
+              href="/contactUs"
               className="text-sm md:text-base hover:text-gray-200"
             >
               Contact
