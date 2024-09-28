@@ -4,16 +4,21 @@ import { FaArrowLeft, FaUpload } from "react-icons/fa";
 import AOS from "aos";
 import Header from "./Header";
 import Footer from "./Footer";
+import toast from "react-hot-toast";
+import { useDispatch } from "react-redux";
+import { createAccount } from "../redux/Slices/AuthSlice";
 
 const SignupForm = () => {
   const [profileImage, setProfileImage] = useState(null);
   const [role, setRole] = useState("");
+  const dispatch = useDispatch();
   const [formData, setFormData] = useState({
-    name: "",
+    fullname: "",
     email: "",
     password: "",
+    avatar: "",
     confirmPassword: "",
-    phoneNumber: "",
+    phone: "",
     farmName: "",
     wholesaleLicense: "",
     roleSpecificInfo: "",
@@ -48,10 +53,32 @@ const SignupForm = () => {
     });
   }, []);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("Form submitted", formData);
-  };
+  async function createNewAccount(event) {
+    event.preventDefault();
+    if (formData.password.length < 8) {
+      toast.error("Password must be at least 8 characters");
+      return;
+    }
+    console.log("Form Data:", formData);
+
+    const fData = {
+      fullname: formData.fullname,
+      email: formData.email,
+      password: formData.password,
+      phone: formData.phone,
+    };
+
+    const response = await dispatch(createAccount(fData)).unwrap();
+    if (response?.success) {
+      navigate("/");
+    }
+    setFormData({
+      fullname: "",
+      email: "",
+      password: "",
+    });
+    setProfileImage("");
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-100">
@@ -71,7 +98,7 @@ const SignupForm = () => {
           <h2 className="text-3xl font-bold text-center mb-6 text-gray-800">
             Sign Up
           </h2>
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={createNewAccount}>
             {/* Profile Image Upload */}
             <div className="form-control mb-4 text-center">
               <div className="flex flex-col items-center">
@@ -110,8 +137,8 @@ const SignupForm = () => {
               </label>
               <input
                 type="text"
-                name="name"
-                value={formData.name}
+                name="fullname"
+                value={formData.fullname}
                 onChange={handleChange}
                 className="input input-bordered w-full px-4 py-2"
                 required
@@ -137,9 +164,9 @@ const SignupForm = () => {
                 <span className="label-text">Phone Number</span>
               </label>
               <input
-                type="tel"
-                name="phoneNumber"
-                value={formData.phoneNumber}
+                type="number"
+                name="phone"
+                value={formData.phone}
                 onChange={handleChange}
                 className="input input-bordered w-full px-4 py-2"
                 required

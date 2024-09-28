@@ -2,15 +2,31 @@ import React, { useState } from "react";
 import Header from "./Header";
 import Footer from "./Footer";
 import AOS from "aos";
+import toast from "react-hot-toast";
+import { useDispatch } from "react-redux";
+import { login } from "../redux/Slices/AuthSlice";
+import { useNavigate } from "react-router-dom";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-  const handleSubmit = (e) => {
+  const loginUser = async (e) => {
     e.preventDefault();
-    // Handle login logic here
-    console.log("Email:", email, "Password:", password);
+    const fData = {email,password}
+
+    if (!email || !password) {
+      toast.error("Email and Password is required!!");
+      return;
+    }
+    const response = await dispatch(login(fData)).unwrap();
+    if (response?.success) {
+      navigate("/");
+    }
+    setEmail("");
+    setPassword("");
   };
 
   useState(() => {
@@ -30,7 +46,7 @@ const LoginPage = () => {
           data-aos="flip-left"
         >
           <h2 className="text-2xl font-semibold text-center mb-6">Login</h2>
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={loginUser}>
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700 text-start">
                 Email

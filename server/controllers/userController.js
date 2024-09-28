@@ -12,6 +12,8 @@ const cookieOption = {
  */
 export const register = async (req, res, next) => {
   const { fullname, email, phone, password } = req.body;
+  console.log(req.body);
+  
   if (!fullname || !email || !phone || !password) {
     return next(new AppError("All fields are mandatory!!", 400));
   }
@@ -84,7 +86,7 @@ export const login = async (req, res, next) => {
     }
     const user = await User.findOne({ email }).select("+password");
 
-    if (!user || !user.comparePassword(password, user.password)) {
+    if (!user || !user.comparePassword(password,user.password)) {
       return next(new AppError("Email or password do not match", 400));
     }
     const token = await user.generateJWTToken();

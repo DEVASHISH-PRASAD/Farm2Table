@@ -1,6 +1,6 @@
 import app from "./app.js";
 import connectToDb from "./config/db.js";
-const Port = process.env.PORT || 5003;
+const Port = process.env.PORT || 5005;
 
 app.listen(Port, async () => {
   await connectToDb();
