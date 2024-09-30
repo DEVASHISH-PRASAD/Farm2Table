@@ -12,8 +12,8 @@ const cookieOption = {
  */
 export const register = async (req, res, next) => {
   const { fullname, email, phone, password } = req.body;
-  console.log(req.body);
-  
+  console.log("REQUEST::", req.body);
+
   if (!fullname || !email || !phone || !password) {
     return next(new AppError("All fields are mandatory!!", 400));
   }
@@ -59,7 +59,7 @@ export const register = async (req, res, next) => {
       );
     }
   }
-  (await user).save();
+  await user.save();
   user.password = undefined;
 
   const token = await user.generateJWTToken();
@@ -85,8 +85,17 @@ export const login = async (req, res, next) => {
       return next(new AppError("Email and password is required!!", 400));
     }
     const user = await User.findOne({ email }).select("+password");
-
-    if (!user || !user.comparePassword(password,user.password)) {
+    if(!user){
+    res.status(400).json({
+      success:false,
+      message:"User not registered!!"
+    })
+  }
+    if (!user || !(await user.comparePassword(password))) {
+      res.status(400).json({
+        success:false,
+        message:"Email and Password do not match"
+      })
       return next(new AppError("Email or password do not match", 400));
     }
     const token = await user.generateJWTToken();
@@ -102,4 +111,39 @@ export const login = async (req, res, next) => {
   } catch (error) {
     return next(new AppError(error.message, 500));
   }
+};
+
+/**
+ * GET PROFILE MODULE
+ */
+export const getProfile = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+    const user = await User.findById(userId);
+    res.status(200).json({
+      success: true,
+      message: "User-Details",
+      user,
+    });
+  } catch (error) {
+     return next(new AppError("Failed to fetch the user details",500))
+  }
+};
+
+/**
+ * LOGOUT MODULE
+ */
+
+export const logout = async (req, res, next) => {
+  try {
+    res.cookie("token", null, {
+      secure: true,
+      maxAge: 0,
+      httpOnly: true,
+    });
+    res.status(200).json({
+      success: true,
+      message: "user logged out successfully",
+    });
+  } catch (error) {}
 };

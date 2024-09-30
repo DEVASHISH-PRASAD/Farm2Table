@@ -2,6 +2,7 @@ import { model, Schema } from "mongoose";
 import bcrypt from "bcryptjs";
 import JWT from "jsonwebtoken";
 import crypto from "crypto";
+import { log } from "console";
 
 const userSchema = new Schema(
   {
@@ -26,7 +27,7 @@ const userSchema = new Schema(
     },
     password: {
       type: String,
-      required: [, "Password is required!!"],
+      required: [true, "Password is required!!"],
       minLength: [8, "Password must be at least 8 characters!!"],
     },
     phone: {
@@ -55,7 +56,10 @@ const userSchema = new Schema(
 userSchema.pre("save", async function (next) {
   if (this.isModified("password")) {
     try {
-      this.password = await bcrypt.hash(this.password, 10);
+      const hashedPassword = await bcrypt.hash(this.password, 10);
+      console.log("Hashed Password:",hashedPassword);
+      this.password=hashedPassword
+
       next();
     } catch (err) {
       next(err);
@@ -80,6 +84,8 @@ userSchema.methods = {
     );
   },
   comparePassword: async function (plainTextPassword) {
+    console.log("Compairing:",plainTextPassword,this.password);
+    
     return await bcrypt.compare(plainTextPassword, this.password);
   },
   generatePasswordResetToken: async function () {
