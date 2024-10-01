@@ -4,7 +4,7 @@ import Footer from "./Footer";
 import AOS from "aos";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
-import { login } from "../redux/Slices/AuthSlice";
+import { login } from "../Redux/Slices/AuthSlice";
 import { useNavigate } from "react-router-dom";
 
 const LoginPage = () => {

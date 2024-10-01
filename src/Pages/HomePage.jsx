@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import AOS from "aos";
+import { FaUserCircle } from "react-icons/fa";
 import img from "../assets/bgImage.jpg";
 import veg from "../assets/veg.jpeg";
 import dairy from "../assets/dairy.jpeg";
@@ -8,11 +9,16 @@ import farm from "../assets/logo.png";
 import farm2 from "../assets/farm2.jpeg";
 import farm3 from "../assets/farm3.jpeg";
 import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { getUserData, logout } from "../Redux/Slices/AuthSlice";
 
 const HomePage = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
+  const userData = useSelector((state) => state?.auth?.data);
+  const isLoggedIn = useSelector((state) => state?.auth?.isLoggedIn);
+  const dispatch = useDispatch();
   const slides = [
     {
       id: 1,
@@ -37,20 +43,23 @@ const HomePage = () => {
     },
   ];
 
-  useEffect(() => {
-    AOS.init({
-      duration: 500,
-      once: false,
-      mirror: false,
-    });
+ useEffect(() => {
+  if (isLoggedIn) {
+    dispatch(getUserData());
+  }
+  AOS.init({ duration: 1000, once: false, mirror: false });
 
-    const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % slides.length);
-    }, 3000); // Change slide every 3 seconds
+  const interval = setInterval(() => {
+    setCurrentSlide((prev) => (prev + 1) % slides.length);
+  }, 3000);
 
-    return () => clearInterval(interval); // Cleanup on component unmount
-  }, [slides.length]);
+  return () => clearInterval(interval);
+}, [dispatch, isLoggedIn]);
 
+
+  const handleLogout = () => {
+    dispatch(logout());
+  };
   return (
     <div className="min-h-screen flex flex-col bg-gray-100">
       {/* Header */}
@@ -109,57 +118,100 @@ const HomePage = () => {
             >
               Contact
             </a>
-            <a
-              href="/signup"
-              className="text-lg cursor-pointer text-white hover:text-gray-200"
-            >
-              Signup
-            </a>
-            <a href="/login" className="text-lg text-white hover:text-gray-200">
-              Login
-            </a>
+            {!isLoggedIn ? (
+              <>
+                <a
+                  href="/signup"
+                  className="text-lg cursor-pointer text-white hover:text-gray-200"
+                >
+                  Signup
+                </a>
+                <a
+                  href="/login"
+                  className="text-lg text-white hover:text-gray-200"
+                >
+                  Login
+                </a>
+              </>
+            ) : (
+              <a
+                href="/dashboard"
+                className="text-lg text-white hover:text-gray-200"
+              >
+                <img
+                  src={userData?.avatar?.secure_url}
+      className="w-10 h-10 m-auto rounded-full border-4 border-gray-300 shadow-lg hover:shadow-xl transition-shadow duration-300"
+                  data-aos='flip-left'
+                />
+              </a>
+            )}
           </nav>
         </div>
 
         {/* Mobile Menu Drawer */}
         {isMenuOpen && (
-          <div className="md:hidden">
-            <nav className="bg-gradient-to-r from-green-700 to-teal-500 px-4 py-4 flex flex-col justify-center items-center">
+          <div className="md:hidden absolute top-20 right-0 z-50">
+            <nav
+              className="bg-[#004526] px-20 py-4 flex flex-col justify-center items-center rounded-lg"
+              data-aos="flip-right"
+            >
+              <a
+                href="/"
+                className="block text-lg text-white hover:text-gray-200 py-2 border-b border-gray-600 w-full text-center" // Added border
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Home
+              </a>
               <a
                 href="/aboutUs"
-                className="block text-lg text-white hover:text-gray-200 py-2"
+                className="block text-lg text-white hover:text-gray-200 py-2 border-b border-gray-600 w-full text-center" // Added border
                 onClick={() => setIsMenuOpen(false)}
               >
                 About
               </a>
               <a
                 href="/products"
-                className="block text-lg text-white hover:text-gray-200 py-2"
+                className="block text-lg text-white hover:text-gray-200 py-2 border-b border-gray-600 w-full text-center" // Added border
                 onClick={() => setIsMenuOpen(false)}
               >
                 Products
               </a>
               <a
                 href="/contactUs"
-                className="block text-lg text-white hover:text-gray-200 py-2"
+                className="block text-lg text-white hover:text-gray-200 py-2 border-b border-gray-600 w-full text-center" // Added border
                 onClick={() => setIsMenuOpen(false)}
               >
                 Contact
               </a>
-              <a
-                href="/signup"
-                className="block text-lg cursor-pointer text-white hover:text-gray-200 py-2"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Signup
-              </a>
-              <a
-                href="/login"
-                className="block text-lg text-white hover:text-gray-200 py-2"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Login
-              </a>
+              {!isLoggedIn ? (
+                <>
+                  <a
+                    href="/signup"
+                    className="block text-lg cursor-pointer text-white hover:text-gray-200 py-2 border-b border-gray-600 w-full text-center" // Added border
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Signup
+                  </a>
+                  <a
+                    href="/login"
+                    className="block text-lg text-white hover:text-gray-200 py-2 border-b border-gray-600 w-full text-center" // Added border
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Login
+                  </a>
+                </>
+              ) : (
+                <a
+                  href="/"
+                  className="block text-lg cursor-pointer text-white hover:text-gray-200 py-2 border-b border-gray-600 w-full text-center" // Added border
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                    handleLogout();
+                  }}
+                >
+                  Logout
+                </a>
+              )}
             </nav>
           </div>
         )}
@@ -191,7 +243,7 @@ const HomePage = () => {
           ))}
         </div>
       </section>
-      
+
       {/* Products Section */}
       <section
         id="products"

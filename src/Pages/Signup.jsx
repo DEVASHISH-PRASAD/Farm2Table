@@ -6,10 +6,10 @@ import Header from "./Header";
 import Footer from "./Footer";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
-import { createAccount } from "../redux/Slices/AuthSlice";
+import { createAccount } from "../Redux/Slices/AuthSlice";
 
 const SignupForm = () => {
-  const [profileImage, setProfileImage] = useState(null);
+  const [profileImage, setProfileImage] = useState();
   const [role, setRole] = useState("");
   const dispatch = useDispatch();
   const [formData, setFormData] = useState({
@@ -35,16 +35,20 @@ const SignupForm = () => {
     setRole(e.target.value);
   };
 
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      if (file.type.startsWith("image/")) {
-        setProfileImage(URL.createObjectURL(file));
-      } else {
-        alert("Please upload a valid image file.");
-      }
+  function getImage(event) {
+    event.preventDefault();
+    const uploadedImage = event.target.files[0];
+
+    if (uploadedImage) {
+      setFormData({ ...formData, avatar: uploadedImage });
+      const fileReader = new FileReader();
+      fileReader.readAsDataURL(uploadedImage);
+      fileReader.addEventListener("load", function () {
+        setProfileImage(this.result);
+      });
     }
-  };
+  }
+
   useState(() => {
     AOS.init({
       duration: 1000,
@@ -59,23 +63,29 @@ const SignupForm = () => {
       toast.error("Password must be at least 8 characters");
       return;
     }
-    console.log("Form Data:", formData);
 
-    const fData = {
-      fullname: formData.fullname,
-      email: formData.email,
-      password: formData.password,
-      phone: formData.phone,
-    };
+    const fData = new FormData();
+    fData.append("fullname", formData.fullname);
+    fData.append("email", formData.email);
+    fData.append("password", formData.password);
+    fData.append("phone", formData.phone);
+    fData.append("avatar", formData.avatar);
 
     const response = await dispatch(createAccount(fData)).unwrap();
     if (response?.success) {
       navigate("/");
     }
+    
     setFormData({
       fullname: "",
       email: "",
       password: "",
+      avatar: "",
+      confirmPassword: "",
+      phone: "",
+      farmName: "",
+      wholesaleLicense: "",
+      roleSpecificInfo: "",
     });
     setProfileImage("");
   }
@@ -99,13 +109,12 @@ const SignupForm = () => {
             Sign Up
           </h2>
           <form onSubmit={createNewAccount}>
-            {/* Profile Image Upload */}
             <div className="form-control mb-4 text-center">
               <div className="flex flex-col items-center">
                 <input
                   type="file"
                   accept="image/*"
-                  onChange={handleImageChange}
+                  onChange={getImage}
                   id="profileImageUpload"
                   className="hidden"
                 />
@@ -130,7 +139,6 @@ const SignupForm = () => {
               </div>
             </div>
 
-            {/* Other Form Fields */}
             <div className="form-control mb-4">
               <label className="label font-medium text-gray-700">
                 <span className="label-text">Name</span>
@@ -255,7 +263,7 @@ const SignupForm = () => {
             <div className="form-control mt-6">
               <button
                 type="submit"
-                className=" bg-[#004526] text-white py-2 px-4 rounded-lg hover:bg-teal-700"
+                className="bg-[#004526] text-white py-2 px-4 rounded-lg hover:bg-teal-700"
               >
                 Sign Up
               </button>

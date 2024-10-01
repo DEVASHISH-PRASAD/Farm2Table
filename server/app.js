@@ -5,6 +5,7 @@ import express from "express";
 import morgan from "morgan";
 import bodyParser from "body-parser";
 import userRoutes from "./routes/userRoutes.js";
+import productRoutes from './routes/productRoute.js'
 const app = express();
 config();
 app.use(
@@ -20,6 +21,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(morgan("dev"));
 
 app.use("/api/v1/user", userRoutes);
+app.use("/api/v1/product",productRoutes );
 
 app.all("*", (req, res) => {
   res.status(404).send("OOPS! Page Not Found!!");

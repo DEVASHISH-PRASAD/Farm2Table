@@ -1,32 +1,42 @@
-import mongoose from 'mongoose';
+import mongoose from 'mongoose'
 
-// Define the Product Schema
-const productSchema = new mongoose.Schema({
+// Define the Item schema
+const itemSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
-    trim: true, // Trim whitespace from name
+    unique: true, // Prevent duplicates
+    trim: true,
+  },
+  img: {
+    public_id: {
+      type: String,
+    },
+    secure_url: {
+      type: String,
+    },
+  },
+  price: {
+    type: String,
+    required: true, // Price format can be string to handle currency symbols
   },
   category: {
     type: String,
-    required: true,
-    enum: ['fruits', 'vegetables', 'grains'], // Only allow certain categories
-  },
-  pricePerUnit: {
-    type: String,
+    enum: ['fruits', 'grains', 'vegetables'], // Allowed categories
     required: true,
   },
-  image: {
-    type: String,
-    required: true, // URL of the product image
+  quantity: {
+    type: Number,
+    required: true,
+    default: 0, // Default quantity is 0
   },
   createdAt: {
     type: Date,
-    default: Date.now, // Automatically add creation date
+    default: Date.now,
   },
 });
 
-// Create the Product Model
-const Product = mongoose.model('Product', productSchema);
+// Create the Item model
+const Item = mongoose.model('Item', itemSchema);
 
-export default Product;
+export default Item;

@@ -3,55 +3,64 @@ import { FaRegArrowAltCircleLeft } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import Footer from "../Footer";
 import Header from "../Header";
+import { useDispatch, useSelector } from "react-redux";
+import { logout } from "../../Redux/Slices/AuthSlice";
 
 const Dashboard = () => {
   const navigate = useNavigate();
-
-  const handleNavigate = () => {
-    navigate("/previous-orders"); // Adjust the route to your needs
-  };
-
-  // Dummy data for demonstration
-  const user = {
-    profilePicture: "https://via.placeholder.com/150",
-    name: "John Doe",
-    email: "john.doe@example.com",
-    userType: "Regular User",
-  };
+  const dispatch = useDispatch();
+  const userData = useSelector((state) => state?.auth?.data);
 
   return (
     <div>
       <Header />
       <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-        <div className="flex flex-col items-center pt-2 p-14 max-w-md mx-auto bg-white shadow-lg rounded-lg">
+        <div className="flex flex-col items-center pt-2 p-14 max-w-md mx-auto bg-white shadow-lg rounded-lg relative">
           <button
-            className="absolute left-[35%] flex items-center text-gray-700 hover:text-gray-900 "
+            className="absolute left-4 top-4 flex items-center justify-center text-gray-700 hover:text-gray-900"
             onClick={() => navigate(-1)}
             aria-label="Go back"
           >
-            <FaRegArrowAltCircleLeft className="mr-2 mt-2 text-2xl" />
+            <FaRegArrowAltCircleLeft className="text-2xl" />
           </button>
           <div className="flex flex-col items-center justify-between">
             <img
-              src={user.profilePicture}
+              src={userData?.avatar?.secure_url}
               alt="Profile"
-              className="w-32 h-32 rounded-full object-cover mb-4"
+              className="w-40 m-auto rounded-full border-4 border-gray-300 shadow-lg"
             />
-            <h1 className="text-2xl font-bold mb-2">{user.name}</h1>
-            <div className="grid grid-cols-2 gap-1">
-              <p className="text-gray-700 mb-1 text-lg font-bold">Email{" "} : </p>
-              <p>{user.email}</p>
-              <p className="text-gray-700 mb-1 text-lg font-bold">
-                User Type{" "}:
-              </p>
-              <p>{user.userType}</p>
+            <h1 className="text-2xl font-bold mb-2 capitalize text-center">
+              {userData.fullname}
+            </h1>
+            <div className="grid grid-cols-2 gap-1 w-full">
+              <p className="text-gray-700 mb-1 text-lg font-bold text-left">Email :</p>
+              <p className="text-left">{userData.email}</p>
+              <p className="text-gray-700 mb-1 text-lg font-bold text-left">User Type :</p>
+              <p className="text-left">{userData.role}</p>
             </div>
           </div>
+          {userData.role==='CUSTOMER'&&
           <button
-            onClick={handleNavigate}
-            className="mt-6 px-4 py-2 ml-4 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+            onClick={()=>navigate('/previous-order')}
+            className="mt-6 px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
           >
             Go to Previous Orders
+          </button>}
+          {userData.role==='ADMIN'&&
+          <button
+            onClick={()=>navigate('/createItem')}
+            className="mt-6 px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+          >
+            Add Product
+          </button>}
+          <button
+            onClick={() => {
+              dispatch(logout());
+              navigate('/');
+            }}
+            className="mt-6 px-4 py-2 bg-red-500 text-white font-semibold rounded-lg shadow-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+          >
+            Logout
           </button>
         </div>
       </div>

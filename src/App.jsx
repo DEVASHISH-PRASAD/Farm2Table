@@ -1,7 +1,7 @@
 // src/App.jsx
 import React, { useEffect } from "react";
 import HomePage from "./Pages/HomePage";
-import "aos/dist/aos.css"; // This import is crucial to include AOS styles
+import "aos/dist/aos.css"; 
 import Signup from "./Pages/Signup";
 import { Route, Routes } from "react-router-dom";
 import VegetablesPage from "./Pages/Products/VegetablePage";
@@ -13,8 +13,10 @@ import ProductPage from "./Pages/ProductPage";
 import AboutUs from "./Pages/AboutUs";
 import LoginPage from "./Pages/LoginPage";
 import Dashboard from "./Pages/User/Dashboard";
+import CreateItem from "./admin/CreateItem";
 
 function App() {
+  
   return (
     <>
       <Routes>
@@ -29,6 +31,7 @@ function App() {
         <Route path="/fruits" element={<FruitsPage />}></Route>
         <Route path="/grains" element={<GrainsPage />}></Route>
         <Route path="/cart" element={<CartPage />}></Route>
+        <Route path='/createItem' element={<CreateItem/>}></Route>
       </Routes>
     </>
   );
