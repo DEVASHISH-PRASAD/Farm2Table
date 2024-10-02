@@ -7,7 +7,14 @@ import path from "path";
 import bodyParser from "body-parser";
 import userRoutes from "./routes/userRoutes.js";
 import productRoutes from "./routes/productRoute.js";
+import { fileURLToPath } from "url";
+
+
+const __filname = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filname)
+
 const app = express();
+
 config();
 app.use(
   cors({
@@ -24,13 +31,10 @@ app.use(morgan("dev"));
 app.use("/api/v1/user", userRoutes);
 app.use("/api/v1/product", productRoutes);
 
-app.get('/', (req, res) => {
-  console.log('Received a request');
-  res.send('Hello, Vercel!');
-});
+app.use(express.static(path.join(__dirname,'/frontend/dist')))
 
-app.all("*", (req, res) => {
-  res.status(404).send("OOPS! Page Not Found!!");
+app.get("*", (req, res) => {
+res.sendFile(path.join(__dirname,'/frontend/dist/index.html'));
 });
 
 export default app;
