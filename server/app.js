@@ -24,6 +24,10 @@ app.use(morgan("dev"));
 app.use("/api/v1/user", userRoutes);
 app.use("/api/v1/product", productRoutes);
 
+app.get('/', (req, res) => {
+  console.log('Received a request');
+  res.send('Hello, Vercel!');
+});
 
 app.all("*", (req, res) => {
   res.status(404).send("OOPS! Page Not Found!!");
