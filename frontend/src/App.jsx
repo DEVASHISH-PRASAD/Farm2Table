@@ -20,7 +20,7 @@ function App() {
   return (
     <>
       <Routes>
-        <Route path="/" element={<HomePage />}></Route>
+        <Route path="https://farm2-table-frontend.vercel.app/" element={<HomePage />}></Route>
         <Route path="/dashboard" element={<Dashboard/>}></Route>
         <Route path="/aboutUs" element={<AboutUs />}></Route>
         <Route path="/products" element={<ProductPage />}></Route>
