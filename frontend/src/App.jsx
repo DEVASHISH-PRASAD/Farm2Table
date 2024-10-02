@@ -20,13 +20,13 @@ function App() {
   return (
     <>
       <Routes>
-        <Route path="https://farm2-table-frontend.vercel.app/" element={<HomePage />}></Route>
+        <Route path="/" element={<HomePage />}></Route>
         <Route path="/dashboard" element={<Dashboard/>}></Route>
         <Route path="/aboutUs" element={<AboutUs />}></Route>
         <Route path="/products" element={<ProductPage />}></Route>
         <Route path="/contactUs" element={<ContactUs />}></Route>
         <Route path="/signup" element={<Signup />}></Route>
-        <Route path="https://farm2-table-frontend.vercel.app/login" element={<LoginPage />}></Route>
+        <Route path="/login" element={<LoginPage />}></Route>
         <Route path="/vegetable" element={<VegetablesPage />}></Route>
         <Route path="/fruits" element={<FruitsPage />}></Route>
         <Route path="/grains" element={<GrainsPage />}></Route>
