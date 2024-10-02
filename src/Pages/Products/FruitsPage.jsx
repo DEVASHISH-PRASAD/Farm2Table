@@ -125,14 +125,14 @@ const FruitsPage = () => {
           className=" md:text-3xl font-semibold mb-6 bg-gray-100"
           onChange={handleRoleChange}
         >
-          <option value="/grains" className="text-base">
-            Organic Grains
+          <option value="/fruits" className="text-base">
+           Fruits
           </option>
           <option value="/vegetable" className="text-base">
             Vegetables
           </option>
-          <option value="/fruits" className="text-base">
-            Fruits
+          <option value="/grains" className="text-base">
+            Grains
           </option>
         </select>
         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
