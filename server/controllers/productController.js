@@ -64,7 +64,7 @@ export const createProduct = async (req, res, next) => {
             public_id: result.public_id,
             secure_url: result.secure_url,
           };
-          await item.save(); // Save after setting the image
+          await item.save(); 
   
           // Remove the file from local storage
           await fs.rm(req.file.path);

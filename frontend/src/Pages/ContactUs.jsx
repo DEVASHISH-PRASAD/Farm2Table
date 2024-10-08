@@ -1,9 +1,17 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import AOS from "aos";
 import Header from "./Header";
 import Footer from "./Footer";
+import toast from "react-hot-toast";
+import axiosInstance from "../Helpers/axiosInstance.js";
 
 const ContactUs = () => {
+  const [userInput, setUserInput] = useState({
+    name: "",
+    email: "",
+    message: "",
+  });
+
   useEffect(() => {
     AOS.init({
       duration: 1000,
@@ -11,6 +19,39 @@ const ContactUs = () => {
       mirror: false,
     });
   }, []);
+
+  const handleInputChange = (event) => {
+    const { name, value } = event.target;
+    setUserInput({ ...userInput, [name]: value });
+  };
+
+  async function onFormSubmit(e) {
+    e.preventDefault();
+    if (!userInput.email || !userInput.name || !userInput.message) {
+      toast.error("All fields are mandatory!!");
+      return;
+    }
+    try {
+      const response = axiosInstance.post("/contact", userInput);
+      toast.promise(response, {
+        loading: "Submitting your message",
+        success: "Form submitted successfully",
+        error: "Failed to submit the form",
+      });
+      const contactResponse = await response;
+      if (contactResponse?.data?.success) {
+        setUserInput({
+          name: "",
+          email: "",
+          message: "",
+        });
+      }
+    } catch (error) {
+      console.log(error);
+      
+      toast.error("Operation Failed");
+    }
+  }
 
   return (
     <div>
@@ -27,15 +68,21 @@ const ContactUs = () => {
             We would love to hear from you! Whether you have questions,
             feedback, or just want to say hello, feel free to reach out to us.
           </p>
-          <form className="w-full max-w-md mx-auto bg-white p-6 rounded-lg shadow-md">
+          <form
+            className="w-full max-w-md mx-auto bg-white p-6 rounded-lg shadow-md"
+            onSubmit={onFormSubmit}
+          >
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700 text-start">
                 Name
               </label>
               <input
                 type="text"
-                className="mt-1 block w-full p-2 border border-gray-300 rounded "
+                className="mt-1 block w-full p-2 border border-gray-300 rounded"
                 placeholder="Your Name"
+                name="name"
+                value={userInput.name} 
+                onChange={handleInputChange}
                 required
               />
             </div>
@@ -47,6 +94,9 @@ const ContactUs = () => {
                 type="email"
                 className="mt-1 block w-full p-2 border border-gray-300 rounded"
                 placeholder="Your Email"
+                name="email"
+                value={userInput.email} 
+                onChange={handleInputChange}
                 required
               />
             </div>
@@ -58,6 +108,9 @@ const ContactUs = () => {
                 className="mt-1 block w-full p-2 border border-gray-300 rounded"
                 placeholder="Your Message"
                 rows="5"
+                name="message"
+                value={userInput.message} 
+                onChange={handleInputChange}
                 required
               ></textarea>
             </div>

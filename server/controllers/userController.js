@@ -2,6 +2,7 @@ import User from "../models/userModel.js";
 import AppError from "../utils/errorUtil.js";
 import cloudinary from "cloudinary";
 import fs from "fs/promises";
+
 const cookieOption = {
   maxAge: 7 * 24 * 60 * 60 * 1000, //7days
   httpOnly: true,
@@ -11,12 +12,13 @@ const cookieOption = {
  * USER REGISTRATION MODULE
  */
 export const register = async (req, res, next) => {
-  const { fullname, email, phone, password } = req.body;
+  const { fullname, email, phone, password,role } = req.body;
   console.log("REQUEST::", req.body);
 
   if (!fullname || !email || !phone || !password) {
     return next(new AppError("All fields are mandatory!!", 400));
   }
+
   const userExist = await User.findOne({ email });
   if (userExist) {
     return next(new AppError("User already exists!!", 400));
@@ -26,6 +28,7 @@ export const register = async (req, res, next) => {
     email,
     phone,
     password,
+    role,
     avatar: {
       public_id: email,
       secure_url:

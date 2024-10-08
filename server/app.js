@@ -3,15 +3,10 @@ import { config } from "dotenv";
 import cors from "cors";
 import express from "express";
 import morgan from "morgan";
-import path from "path";
 import bodyParser from "body-parser";
 import userRoutes from "./routes/userRoutes.js";
 import productRoutes from "./routes/productRoute.js";
-import { fileURLToPath } from "url";
-
-
-const __filname = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filname)
+import miscRoute from "./routes/miscRoutes.js"
 
 const app = express();
 
@@ -30,11 +25,12 @@ app.use(morgan("dev"));
 
 app.use("/api/v1/user", userRoutes);
 app.use("/api/v1/product", productRoutes);
-
-app.use(express.static(path.join(__dirname,'/frontend/dist')))
+app.use("/api/v1",miscRoute)
 
 app.get("*", (req, res) => {
-res.sendFile(path.join(__dirname,'/frontend/dist/index.html'));
+  res.status(404).json({
+    message:"404! PAGE NOT FOUND"
+  })
 });
 
 export default app;

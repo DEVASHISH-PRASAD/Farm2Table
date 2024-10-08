@@ -10,7 +10,6 @@ import { createAccount } from "../Redux/Slices/AuthSlice";
 
 const SignupForm = () => {
   const [profileImage, setProfileImage] = useState();
-  const [role, setRole] = useState("");
   const dispatch = useDispatch();
   const [formData, setFormData] = useState({
     fullname: "",
@@ -19,9 +18,7 @@ const SignupForm = () => {
     avatar: "",
     confirmPassword: "",
     phone: "",
-    farmName: "",
-    wholesaleLicense: "",
-    roleSpecificInfo: "",
+    role:""
   });
 
   const navigate = useNavigate();
@@ -70,6 +67,7 @@ const SignupForm = () => {
     fData.append("password", formData.password);
     fData.append("phone", formData.phone);
     fData.append("avatar", formData.avatar);
+    fData.append("role",formData.role);
 
     const response = await dispatch(createAccount(fData)).unwrap();
     if (response?.success) {
@@ -83,9 +81,7 @@ const SignupForm = () => {
       avatar: "",
       confirmPassword: "",
       phone: "",
-      farmName: "",
-      wholesaleLicense: "",
-      roleSpecificInfo: "",
+      role:""
     });
     setProfileImage("");
   }
@@ -215,50 +211,18 @@ const SignupForm = () => {
               </label>
               <select
                 name="role"
-                value={role}
-                onChange={handleRoleChange}
+                value={formData.role}
+                onChange={handleChange}
                 className="select select-bordered w-full px-4 py-2"
                 required
               >
                 <option value="" disabled>
                   Select a Role
                 </option>
-                <option value="farmer">Farmer</option>
-                <option value="wholesaler">Wholesaler</option>
+                <option value="FARMER">Farmer</option>
+                <option value="CUSTOMER">Customer</option>
               </select>
             </div>
-
-            {role === "farmer" && (
-              <div className="form-control mb-4">
-                <label className="label font-medium text-gray-700">
-                  <span className="label-text">Farm Name</span>
-                </label>
-                <input
-                  type="text"
-                  name="farmName"
-                  value={formData.farmName}
-                  onChange={handleChange}
-                  className="input input-bordered w-full px-4 py-2"
-                  required
-                />
-              </div>
-            )}
-
-            {role === "wholesaler" && (
-              <div className="form-control mb-4">
-                <label className="label font-medium text-gray-700">
-                  <span className="label-text">Wholesale License</span>
-                </label>
-                <input
-                  type="text"
-                  name="wholesaleLicense"
-                  value={formData.wholesaleLicense}
-                  onChange={handleChange}
-                  className="input input-bordered w-full px-4 py-2"
-                  required
-                />
-              </div>
-            )}
 
             <div className="form-control mt-6">
               <button
