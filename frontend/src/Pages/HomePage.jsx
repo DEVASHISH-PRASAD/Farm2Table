@@ -54,7 +54,7 @@ const HomePage = () => {
   }, 3000);
 
   return () => clearInterval(interval);
-}, [dispatch, isLoggedIn]);
+}, [isLoggedIn]);
 
 
   const handleLogout = () => {
@@ -65,16 +65,17 @@ const HomePage = () => {
       {/* Header */}
       <header className="bg-[#004526]">
         <div className="container mx-auto px-4 py-3 flex justify-between items-center">
-          <div className="flex items-center">
-            <img
-              src={farm}
-              className="w-16 md:w-20 pr-4 ml-[-10%] md:ml-[-10%] sm:ml-[-10%]"
-              alt="Farm Logo"
-            />
-            <h1 className="text-2xl md:text-4xl font-bold text-white">
-              FarmToMarket
-            </h1>
-          </div>
+        <div className="flex items-center md:ml-6">
+  <img
+    src={farm}
+    className="w-16 md:w-20 pr-4"
+    alt="Farm Logo"
+  />
+  <h1 className="text-2xl md:text-4xl font-bold text-white">
+    FarmToMarket
+  </h1>
+</div>
+
           <div className="md:hidden">
             <button
               className="text-white focus:outline-none"
@@ -201,6 +202,7 @@ const HomePage = () => {
                   </a>
                 </>
               ) : (
+                <div>
                 <a
                   href="/"
                   className="block text-lg cursor-pointer text-white hover:text-gray-200 py-2 border-b border-gray-600 w-full text-center" // Added border
@@ -211,6 +213,8 @@ const HomePage = () => {
                 >
                   Logout
                 </a>
+                <a href="/dashboard" cl className="block text-lg cursor-pointer text-white hover:text-gray-200 py-2 border-b border-gray-600 w-full text-center">Profile</a>
+                </div>
               )}
             </nav>
           </div>
@@ -425,7 +429,7 @@ const HomePage = () => {
           </div>
         </div>
         <div className="container mx-auto text-center mt-4 md:mt-8">
-          <p className="text-xs md:text-sm">
+          <p className="text-xs md:text-sm text-white">
             © {new Date().getFullYear()} FarmToMarket. All rights reserved.
           </p>
         </div>

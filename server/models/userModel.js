@@ -2,7 +2,6 @@ import { model, Schema } from "mongoose";
 import bcrypt from "bcryptjs";
 import JWT from "jsonwebtoken";
 import crypto from "crypto";
-import { log } from "console";
 
 const userSchema = new Schema(
   {
@@ -96,7 +95,6 @@ userSchema.methods = {
       .update(resetToken)
       .digest("hex");
     this.forgotPasswordExpiry = Date.now() + 15 * 60 * 1000; // 15 minutes
-
     return resetToken;
   },
 };

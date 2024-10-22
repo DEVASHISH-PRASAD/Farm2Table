@@ -4,6 +4,20 @@ import Header from "./Header";
 import Footer from "./Footer";
 import toast from "react-hot-toast";
 import axiosInstance from "../Helpers/axiosInstance.js";
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import "leaflet/dist/leaflet.css"; // Import Leaflet CSS
+import L from "leaflet";
+import markerIcon from "leaflet/dist/images/marker-icon.png";
+import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
+import markerShadow from "leaflet/dist/images/marker-shadow.png";
+
+// Fix the default icon issue
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: markerIcon2x,
+  iconUrl: markerIcon,
+  shadowUrl: markerShadow,
+});
 
 const ContactUs = () => {
   const [userInput, setUserInput] = useState({
@@ -48,7 +62,6 @@ const ContactUs = () => {
       }
     } catch (error) {
       console.log(error);
-      
       toast.error("Operation Failed");
     }
   }
@@ -56,18 +69,15 @@ const ContactUs = () => {
   return (
     <div>
       <Header />
-      <div className="min-h-screen bg-gray-100 flex flex-col justify-center items-center">
+      <div className="min-h-screen bg-gray-100 flex flex-col md:flex-row">
         <section
-          className="container mx-auto px-4 py-8 md:py-16 text-center"
+          className="container mx-auto px-4 py-8 md:py-16 md:w-1/2"
           data-aos="fade-up"
         >
-          <h2 className="text-2xl md:text-3xl font-semibold mb-6">
+          <h2 className="text-2xl md:text-3xl font-semibold mb-6 text-center">
             Get in Touch
           </h2>
-          <p className="text-sm md:text-lg text-gray-700 max-w-xl mx-auto mb-8">
-            We would love to hear from you! Whether you have questions,
-            feedback, or just want to say hello, feel free to reach out to us.
-          </p>
+         
           <form
             className="w-full max-w-md mx-auto bg-white p-6 rounded-lg shadow-md"
             onSubmit={onFormSubmit}
@@ -122,6 +132,25 @@ const ContactUs = () => {
             </button>
           </form>
         </section>
+
+        {/* Map Section */}
+        <div className="md:w-1/2 m-3 rounded-lg overflow-hidden shadow-md border-gray-400">
+          <MapContainer 
+            center={[28.6139, 77.2090]} 
+            zoom={30} 
+            style={{ height: "100%", width: "100%" }}
+          >
+            <TileLayer
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+            />
+            <Marker position={[28.6139, 77.2090]}>
+              <Popup>
+                Our Location <br /> We are here.
+              </Popup>
+            </Marker>
+          </MapContainer>
+        </div>
       </div>
       <Footer />
     </div>

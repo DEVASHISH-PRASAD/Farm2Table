@@ -70,7 +70,7 @@ const Footer = () => {
         </div>
       </div>
       <div className="container mx-auto text-center mt-4 md:mt-8">
-        <p className="text-xs md:text-sm">
+        <p className="text-xs md:text-sm text-white">
           © {new Date().getFullYear()} FarmToMarket. All rights reserved.
         </p>
       </div>

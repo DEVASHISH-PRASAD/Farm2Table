@@ -1,6 +1,5 @@
 import mongoose from 'mongoose'
 
-// Define the Item schema
 const itemSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -17,18 +16,18 @@ const itemSchema = new mongoose.Schema({
     },
   },
   price: {
-    type: String,
-    required: true, // Price format can be string to handle currency symbols
+    type: String,  //String type to handle currency symbol
+    required: true, 
   },
   category: {
     type: String,
-    enum: ['fruits', 'grains', 'vegetables'], // Allowed categories
+    enum: ['fruits', 'grains', 'vegetables'], 
     required: true,
   },
   quantity: {
     type: Number,
     required: true,
-    default: 0, // Default quantity is 0
+    default: 0, 
   },
   createdAt: {
     type: Date,
@@ -36,7 +35,6 @@ const itemSchema = new mongoose.Schema({
   },
 });
 
-// Create the Item model
 const Item = mongoose.model('Item', itemSchema);
 
 export default Item;

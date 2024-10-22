@@ -13,7 +13,7 @@ const Dashboard = () => {
 
   return (
     <div>
-      <Header />
+      <Header className="true" />
       <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
         <div className="flex flex-col items-center pt-2 p-14 max-w-md mx-auto bg-white shadow-lg rounded-lg relative">
           <button

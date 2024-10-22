@@ -18,7 +18,7 @@ const FruitsPage = () => {
   const items = useSelector((state) => state.products.items);
   const loading = useSelector((state) => state.products.loading);
   const error = useSelector((state) => state.products.error);
-  const userData = useSelector((state)=>state.auth.data)
+  const userData = useSelector((state) => state.auth.data);
 
   useEffect(() => {
     AOS.init({
@@ -73,20 +73,25 @@ const FruitsPage = () => {
       toast.error(`Please enter a valid weight for ${name}`);
       return;
     }
+    
     const currentCart = JSON.parse(localStorage.getItem("cartItems")) || [];
     const itemIndex = currentCart.findIndex((item) => item.name === name);
+    const price = items.find((item) => item.name === name).price; 
+
     if (itemIndex > -1) {
       currentCart[itemIndex].weight = weight;
+      currentCart[itemIndex].totalCost = weight * price; 
     } else {
       currentCart.push({
         name,
         weight,
-        msp: items.find((item) => item.name === name).msp,
+        price,
+        totalCost: weight * price, 
       });
     }
+
     localStorage.setItem("cartItems", JSON.stringify(currentCart));
-    const updatedCartItems =
-      JSON.parse(localStorage.getItem("cartItems")) || [];
+    const updatedCartItems = JSON.parse(localStorage.getItem("cartItems")) || [];
     const totalCount = updatedCartItems.reduce(
       (sum, item) => sum + (item.weight > 0 ? 1 : 0),
       0
@@ -121,19 +126,13 @@ const FruitsPage = () => {
       </header>
 
       <section className="container mx-auto px-4 py-8 md:py-16 text-sm" data-aos="flip-left">
-      <select
-          className=" md:text-3xl font-semibold mb-6 bg-gray-100"
+        <select
+          className="md:text-3xl font-semibold mb-6 bg-gray-100"
           onChange={handleRoleChange}
         >
-          <option value="/fruits" className="text-base">
-           Fruits
-          </option>
-          <option value="/vegetable" className="text-base">
-            Vegetables
-          </option>
-          <option value="/grains" className="text-base">
-            Grains
-          </option>
+          <option value="/fruits" className="text-base">Fruits</option>
+          <option value="/vegetable" className="text-base">Vegetables</option>
+          <option value="/grains" className="text-base">Grains</option>
         </select>
         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
           {loading ? (
@@ -163,7 +162,7 @@ const FruitsPage = () => {
                 </div>
                 {errors[item.name] && <p className="text-red-500 text-sm mt-1">{errors[item.name]}</p>}
 
-               <button
+                <button
                   onClick={() => handleAddToCart(item.name)}
                   className="mt-4 bg-[#ffdc00] text-black px-4 py-3 rounded-full hover:bg-[#ffd700] hover:scale-110 transition-all duration-200"
                 >
@@ -174,16 +173,20 @@ const FruitsPage = () => {
           )}
         </div>
       </section>
-{(userData.role==="ADMIN")?
-      (<div className="text-center my-8">
-        <Link to="/createItem" className="inline-block bg-[#132b20] text-white px-4 py-3 rounded-full hover:bg-[#004530] hover:scale-110 transition-all duration-200">
-        Add New Product
-        </Link>
-      </div>):(<div className="text-center my-8">
-        <Link to="/" className="inline-block bg-[#004526] text-white px-4 py-3 rounded-full hover:bg-[#004530] hover:scale-110 transition-all duration-200">
-          Back To Home
-        </Link>
-      </div>)}
+
+      {userData.role === "ADMIN" ? (
+        <div className="text-center my-8">
+          <Link to="/createItem" className="inline-block bg-[#132b20] text-white px-4 py-3 rounded-full hover:bg-[#004530] hover:scale-110 transition-all duration-200">
+            Add New Product
+          </Link>
+        </div>
+      ) : (
+        <div className="text-center my-8">
+          <Link to="/" className="inline-block bg-[#004526] text-white px-4 py-3 rounded-full hover:bg-[#004530] hover:scale-110 transition-all duration-200">
+            Back To Home
+          </Link>
+        </div>
+      )}
       <Footer />
     </div>
   );
