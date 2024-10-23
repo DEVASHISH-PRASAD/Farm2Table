@@ -148,6 +148,7 @@ export const logout = async (req, res, next) => {
       maxAge: 0,
       path:"/",
       httpOnly: true,
+      sameSite:"None"
     });
     console.log("Cookie cleared");
     res.status(200).json({
