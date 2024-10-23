@@ -6,7 +6,7 @@ import fs from "fs/promises";
 const cookieOption = {
   maxAge: 7 * 24 * 60 * 60 * 1000, //7days
   httpOnly: true,
-  secure: true,
+  secure: process.env.NODE_ENV === 'production',
 };
 /**
  * USER REGISTRATION MODULE
