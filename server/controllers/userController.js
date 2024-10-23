@@ -105,7 +105,9 @@ export const login = async (req, res, next) => {
     const token = await user.generateJWTToken();
     user.password = undefined;
 
+    console.log("Setting cookie...");
     res.cookie("token", token, cookieOption);
+    console.log("Cookie Set:", { name: "token", value: token });
 
     res.status(200).json({
       success: true,
