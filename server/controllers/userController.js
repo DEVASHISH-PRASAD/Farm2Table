@@ -7,7 +7,6 @@ const cookieOption = {
   maxAge: 7 * 24 * 60 * 60 * 1000, //7days
   httpOnly: true,
   secure: process.env.NODE_ENV === "production",
-  path: "/",
   sameSite: "None",
 };
 /**
