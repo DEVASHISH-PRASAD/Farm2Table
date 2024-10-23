@@ -6,14 +6,14 @@ import fs from "fs/promises";
 const cookieOption = {
   maxAge: 7 * 24 * 60 * 60 * 1000, //7days
   httpOnly: true,
-  secure: process.env.NODE_ENV === 'production',
-  path:"/"
+  secure: process.env.NODE_ENV === "production",
+  path: "/",
 };
 /**
  * USER REGISTRATION MODULE
  */
 export const register = async (req, res, next) => {
-  const { fullname, email, phone, password,role } = req.body;
+  const { fullname, email, phone, password, role } = req.body;
   console.log("REQUEST::", req.body);
 
   if (!fullname || !email || !phone || !password) {
@@ -89,17 +89,17 @@ export const login = async (req, res, next) => {
       return next(new AppError("Email and password is required!!", 400));
     }
     const user = await User.findOne({ email }).select("+password");
-    if(!user){
-    res.status(400).json({
-      success:false,
-      message:"User not registered!!"
-    })
-  }
+    if (!user) {
+      res.status(400).json({
+        success: false,
+        message: "User not registered!!",
+      });
+    }
     if (!user || !(await user.comparePassword(password))) {
       res.status(400).json({
-        success:false,
-        message:"Email and Password do not match"
-      })
+        success: false,
+        message: "Email and Password do not match",
+      });
       return next(new AppError("Email or password do not match", 400));
     }
     const token = await user.generateJWTToken();
@@ -132,7 +132,7 @@ export const getProfile = async (req, res, next) => {
       user,
     });
   } catch (error) {
-     return next(new AppError("Failed to fetch the user details",500))
+    return next(new AppError("Failed to fetch the user details", 500));
   }
 };
 
