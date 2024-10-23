@@ -10,14 +10,11 @@ const initialState = {
 
 export const createAccount = createAsyncThunk("/auth/signup", async (data) => {
   try {
-    const res = await toast.promise(
-      axiosInstance.post("user/register", data),
-      {
-        loading: "Wait! Creating your account",
-        success: (data) => data?.data?.message,
-        error: "Failed to create an account!",
-      }
-    );
+    const res = await toast.promise(axiosInstance.post("user/register", data), {
+      loading: "Wait! Creating your account",
+      success: (data) => data?.data?.message,
+      error: "Failed to create an account!",
+    });
     return res.data;
   } catch (error) {
     toast.error(error?.response?.data?.message);
@@ -27,14 +24,11 @@ export const createAccount = createAsyncThunk("/auth/signup", async (data) => {
 
 export const login = createAsyncThunk("/auth/login", async (data) => {
   try {
-    const res = await toast.promise(
-      axiosInstance.post("user/login", data),
-      {
-        loading: "Wait! Authentication in progress..",
-        success: (data) => data?.data?.message,
-        error: (data) => data?.data?.message,
-      }
-    );
+    const res = await toast.promise(axiosInstance.post("user/login", data), {
+      loading: "Wait! Authentication in progress..",
+      success: (data) => data?.data?.message,
+      error: (data) => data?.data?.message,
+    });
     return res.data;
   } catch (error) {
     toast.error(error?.response?.data?.message);
@@ -44,14 +38,11 @@ export const login = createAsyncThunk("/auth/login", async (data) => {
 
 export const getUserData = createAsyncThunk("/user/details", async () => {
   try {
-    const res = await toast.promise(
-      axiosInstance.get("/user/me"),
-      {
-        loading: "Fetching user details...",
-        success: "User details fetched successfully!",
-        error: (error) => error.message,
-      }
-    );
+    const res = await toast.promise(axiosInstance.get("/user/me"), {
+      loading: "Fetching user details...",
+      success: "User details fetched successfully!",
+      error: (error) => error.message,
+    });
     return res.data;
   } catch (error) {
     throw error;
@@ -60,14 +51,11 @@ export const getUserData = createAsyncThunk("/user/details", async () => {
 
 export const logout = createAsyncThunk("/auth/logout", async () => {
   try {
-    const res = await toast.promise(
-      axiosInstance.get("user/logout"),
-      {
-        loading: "Wait! Log out in progress...",
-        success: "User logged out successfully",
-        error: "Failed to logout!!",
-      }
-    );
+    const res = await toast.promise(axiosInstance.get("user/logout"), {
+      loading: "Wait! Log out in progress...",
+      success: "User logged out successfully",
+      error: "Failed to logout!!",
+    });
     return res.data;
   } catch (error) {
     toast.error(error?.response?.data?.message);
@@ -82,7 +70,8 @@ const authSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(login.fulfilled, (state, action) => {
-        localStorage.setItem("data", JSON.stringify(action.payload.user));
+        const { user } = action.payload;
+        localStorage.setItem("data", JSON.stringify(user));
         localStorage.setItem("isLoggedIn", "true");
         localStorage.setItem("role", action.payload.user.role);
         state.isLoggedIn = true;
@@ -98,7 +87,8 @@ const authSlice = createSlice({
         state.role = "";
       })
       .addCase(getUserData.fulfilled, (state, action) => {
-        if (action.payload.user) {
+        const { user } = action.payload;
+        if (user) {
           localStorage.setItem("data", JSON.stringify(action.payload.user));
           localStorage.setItem("isLoggedIn", "true");
           localStorage.setItem("role", action.payload.user.role);
