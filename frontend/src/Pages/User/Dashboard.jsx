@@ -11,6 +11,10 @@ const Dashboard = () => {
   const dispatch = useDispatch();
   const userData = useSelector((state) => state?.auth?.data);
 
+  const handleLogout = () =>{
+    dispatch(logout());
+  }
+
   return (
     <div>
       <Header className="true" />
@@ -55,7 +59,7 @@ const Dashboard = () => {
           </button>}
           <button
             onClick={() => {
-              dispatch(logout());
+              handleLogout();
               navigate('/');
             }}
             className="mt-6 px-4 py-2 bg-red-500 text-white font-semibold rounded-lg shadow-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"

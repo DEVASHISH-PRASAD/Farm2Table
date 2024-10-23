@@ -203,16 +203,16 @@ const HomePage = () => {
                 </>
               ) : (
                 <div>
-                <a
-                  href="/"
+                <button
                   className="block text-lg cursor-pointer text-white hover:text-gray-200 py-2 border-b border-gray-600 w-full text-center" // Added border
                   onClick={() => {
+                    handleLogout();
                     setIsMenuOpen(false);
-                     handleLogout;
+                    navigate("/")
                   }}
                 >
                   Logout
-                </a>
+                </button>
                 <a href="/dashboard" cl className="block text-lg cursor-pointer text-white hover:text-gray-200 py-2 border-b border-gray-600 w-full text-center">Profile</a>
                 </div>
               )}
