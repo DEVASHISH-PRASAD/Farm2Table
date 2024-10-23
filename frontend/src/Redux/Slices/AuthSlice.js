@@ -51,7 +51,7 @@ export const getUserData = createAsyncThunk("/user/details", async () => {
 
 export const logout = createAsyncThunk("/auth/logout", async () => {
   try {
-    const res = await toast.promise(axiosInstance.get("user/logout"), {
+    const res = await toast.promise(axiosInstance.get("/user/logout"), {
       loading: "Wait! Log out in progress...",
       success: "User logged out successfully",
       error: "Failed to logout!!",
