@@ -144,12 +144,12 @@ export const getProfile = async (req, res, next) => {
 export const logout = async (req, res, next) => {
   try {
     res.cookie("token", null, {
-      secure: true,
       secure: process.env.NODE_ENV === 'production',
       maxAge: 0,
       path:"/",
       httpOnly: true,
     });
+    console.log("Cookie cleared");
     res.status(200).json({
       success: true,
       message: "user logged out successfully",
