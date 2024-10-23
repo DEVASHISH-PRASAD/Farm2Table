@@ -145,6 +145,7 @@ export const logout = async (req, res, next) => {
   try {
     res.cookie("token", null, {
       secure: true,
+      secure: process.env.NODE_ENV === "production",
       maxAge: 0,
       httpOnly: true,
     });
