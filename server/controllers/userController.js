@@ -7,6 +7,7 @@ const cookieOption = {
   maxAge: 7 * 24 * 60 * 60 * 1000, //7days
   httpOnly: true,
   secure: process.env.NODE_ENV === "production",
+  path: "/",
   sameSite: "None",
 };
 /**
@@ -144,8 +145,9 @@ export const logout = async (req, res, next) => {
   try {
     res.cookie("token", null, {
       secure: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: process.env.NODE_ENV === 'production',
       maxAge: 0,
+      path:"/",
       httpOnly: true,
     });
     res.status(200).json({

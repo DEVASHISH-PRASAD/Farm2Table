@@ -208,7 +208,7 @@ const HomePage = () => {
                   className="block text-lg cursor-pointer text-white hover:text-gray-200 py-2 border-b border-gray-600 w-full text-center" // Added border
                   onClick={() => {
                     setIsMenuOpen(false);
-                    handleLogout();
+                    dispatch(logout());
                   }}
                 >
                   Logout
