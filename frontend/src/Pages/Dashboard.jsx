@@ -1,23 +1,22 @@
 import React from "react";
 import { FaRegArrowAltCircleLeft } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import Footer from "../Footer";
-import Header from "../Header";
+import Footer from "./Footer";
 import { useDispatch, useSelector } from "react-redux";
-import { logout } from "../../Redux/Slices/AuthSlice";
-
+import { logout } from "../Redux/Slices/AuthSlice";
+import Header from "./Header";
 const Dashboard = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const userData = useSelector((state) => state?.auth?.data);
 
-  const handleLogout = () =>{
+  const handleLogout = () => {
     dispatch(logout());
-  }
+  };
 
   return (
     <div>
-      <Header className="true" />
+      <Header/>
       <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
         <div className="flex flex-col items-center pt-2 p-14 max-w-md mx-auto bg-white shadow-lg rounded-lg relative">
           <button
@@ -37,30 +36,36 @@ const Dashboard = () => {
               {userData.fullname}
             </h1>
             <div className="grid grid-cols-2 gap-1 w-full">
-              <p className="text-gray-700 mb-1 text-lg font-bold text-left">Email :</p>
+              <p className="text-gray-700 mb-1 text-lg font-bold text-left">
+                Email :
+              </p>
               <p className="text-left">{userData.email}</p>
-              <p className="text-gray-700 mb-1 text-lg font-bold text-left">User Type :</p>
+              <p className="text-gray-700 mb-1 text-lg font-bold text-left">
+                User Type :
+              </p>
               <p className="text-left">{userData.role}</p>
             </div>
           </div>
-          {userData.role==='CUSTOMER'&&
-          <button
-            onClick={()=>navigate('/previous-order')}
-            className="mt-6 px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
-          >
-            Go to Previous Orders
-          </button>}
-          {userData.role==='ADMIN'&&
-          <button
-            onClick={()=>navigate('/createItem')}
-            className="mt-6 px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
-          >
-            Add Product
-          </button>}
+          {userData.role === "CUSTOMER" && (
+            <button
+              onClick={() => navigate("/previous-order")}
+              className="mt-6 px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+            >
+              Go to Previous Orders
+            </button>
+          )}
+          {userData.role === "ADMIN" && (
+            <button
+              onClick={() => navigate("/createItem")}
+              className="mt-6 px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+            >
+              Add Product
+            </button>
+          )}
           <button
             onClick={() => {
               handleLogout();
-              navigate('/');
+              navigate("/");
             }}
             className="mt-6 px-4 py-2 bg-red-500 text-white font-semibold rounded-lg shadow-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
           >

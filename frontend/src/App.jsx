@@ -12,7 +12,7 @@ import ContactUs from "./Pages/ContactUs";
 import ProductPage from "./Pages/ProductPage";
 import AboutUs from "./Pages/AboutUs";
 import LoginPage from "./Pages/LoginPage";
-import Dashboard from "./Pages/User/Dashboard";
+import Dashboard from "./Pages/Dashboard";
 import CreateItem from "./admin/CreateItem";
 import AccessDenied from "./Pages/AccessDenied";
 import RequireAuth from "./components/RequireAuth";
@@ -28,7 +28,7 @@ function App() {
             <RequireAuth allowedRoles={["ADMIN", "CUSTOMER", "FARMER"]} />
           }
         >
-          <Route path="/dashboard" element={<Dashboard />}></Route>
+          <Route path="/dashboard" element={<Dashboard/>}></Route>
           <Route path="/cart" element={<CartPage />}></Route>
         </Route>
 

@@ -16,24 +16,19 @@ const Header = () => {
     }
   }, [dispatch]);
 
-  function handleLogout(){
-    dispatch(logout())
+  function handleLogout() {
+    dispatch(logout());
   }
-
 
   return (
     <header className="bg-[#004526]">
       <div className="container mx-auto px-4 py-3 flex justify-between items-center">
-      <div className="flex items-center md:ml-6"> 
-  <img
-    src={farm}
-    className="w-16 md:w-20 pr-4"
-    alt="Farm Logo"
-  />
-  <h1 className="text-2xl md:text-4xl font-bold text-white">
-    FarmToMarket
-  </h1>
-</div>
+        <div className="flex items-center md:ml-6">
+          <img src={farm} className="w-16 md:w-20 pr-4" alt="Farm Logo" />
+          <h1 className="text-2xl md:text-4xl font-bold text-white">
+            FarmToMarket
+          </h1>
+        </div>
 
         <div className="md:hidden">
           <button
@@ -98,7 +93,7 @@ const Header = () => {
               <img
                 src={userData?.avatar?.secure_url}
                 className="w-10 h-10 m-auto rounded-full border-4 border-gray-300 shadow-lg hover:shadow-xl transition-shadow duration-300"
-                data-aos='flip-left'
+                data-aos="flip-left"
               />
             </a>
           )}
@@ -158,17 +153,22 @@ const Header = () => {
               </>
             ) : (
               <div>
-              <a
-                href="/"
-                className="block text-lg cursor-pointer text-white hover:text-gray-200 py-2 border-b border-gray-600 w-full text-center" // Added border
-                onClick={() => {
-                  setIsMenuOpen(false);
-                  handleLogout();
-                }}
-              >
-                Logout
-              </a>
-              <a href="/dashboard" cl className="block text-lg cursor-pointer text-white hover:text-gray-200 py-2 border-b border-gray-600 w-full text-center">Profile</a>
+                <a
+                  href="/"
+                  className="block text-lg cursor-pointer text-white hover:text-gray-200 py-2 border-b border-gray-600 w-full text-center" // Added border
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                    handleLogout();
+                  }}
+                >
+                  Logout
+                </a>
+                <a
+                  href="/dashboard"
+                  className="block text-lg cursor-pointer text-white hover:text-gray-200 py-2 border-b border-gray-600 w-full text-center"
+                >
+                  Profile
+                </a>
               </div>
             )}
           </nav>
