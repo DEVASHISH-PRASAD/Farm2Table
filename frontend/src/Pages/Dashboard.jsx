@@ -5,14 +5,16 @@ import Footer from "./Footer";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../Redux/Slices/AuthSlice";
 import Header from "./Header";
+
+
 const Dashboard = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const userData = useSelector((state) => state?.auth?.data);
 
-  const handleLogout = () => {
+  function handleLogout() {
     dispatch(logout());
-  };
+  }
 
   return (
     <div>
@@ -65,7 +67,6 @@ const Dashboard = () => {
           <button
             onClick={() => {
               handleLogout();
-              navigate("/");
             }}
             className="mt-6 px-4 py-2 bg-red-500 text-white font-semibold rounded-lg shadow-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
           >

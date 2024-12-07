@@ -99,7 +99,7 @@ const getImage = (event) => {
             <FaArrowLeft className="mr-2 mt-2 text-xl" />
           </button>
           <h2 className="text-3xl font-bold text-center mb-6 text-gray-800">
-            Create New Item
+            Add New Product
           </h2>
           <form onSubmit={createNewItem}>
             <div className="form-control mb-4 text-center">
@@ -200,14 +200,14 @@ const getImage = (event) => {
                 type="submit"
                 className="bg-[#004526] text-white py-2 px-4 rounded-lg hover:bg-teal-700"
               >
-                Create Item
+                Add Product
               </button>
             </div>
 
             <div className="text-center mt-4">
               <p className="text-gray-600">
                 Want to go back?{" "}
-                <a href="/items" className="text-blue-500 hover:underline">
+                <a href="/products" className="text-blue-500 hover:underline">
                   View Items
                 </a>
               </p>
