@@ -1,13 +1,15 @@
 {
   "name": "farm2table",
-  "private": true,
+  "homepage": "https://DEVASHISH-PRASAD.github.io/Farm2Market/",
   "version": "0.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist"
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.2.7",
@@ -16,6 +18,7 @@
     "firebase": "^11.0.1",
     "flowbite": "^2.5.1",
     "flowbite-react": "^0.10.1",
+    "gh-pages": "^6.2.0",
     "leaflet": "^1.9.4",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
@@ -25,6 +28,7 @@
     "react-router-dom": "^6.26.1",
     "react-slick": "^0.30.2",
     "react-spring": "^9.7.4",
+    "rollup": "^4.28.1",
     "slick-carousel": "^1.8.1"
   },
   "devDependencies": {
