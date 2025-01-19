@@ -60,6 +60,14 @@ const SignupForm = () => {
       toast.error("Password must be at least 8 characters");
       return;
     }
+    if (formData.fullname.length < 5) {
+      toast.error("Name must be at least 8 characters");
+      return;
+    }
+    if (formData.phone.length < 10) {
+      toast.error("Phone number must have 10 digits");
+      return;
+    }
 
     const fData = new FormData();
     fData.append("fullname", formData.fullname);
