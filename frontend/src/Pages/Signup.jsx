@@ -61,7 +61,7 @@ const SignupForm = () => {
       return;
     }
     if (formData.fullname.length < 5) {
-      toast.error("Name must be at least 8 characters");
+      toast.error("Name must be at least 5 characters");
       return;
     }
     if (formData.phone.length === 10) {
