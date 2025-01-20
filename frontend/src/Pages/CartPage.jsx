@@ -1,22 +1,35 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
-import Footer from "./Footer";
+import { removeItem, updateItemQuantity, clearCart, createOrder, verifyPayment } from "../Redux/Slices/CartSlice";
 import toast from "react-hot-toast";
 
 const CartPage = () => {
-  const [cartItems, setCartItems] = useState([]);
+  const { items: cartItems, loading, error, paymentLoading, paymentError } = useSelector((state) => state.cart);
+  const dispatch = useDispatch();
   const navigate = useNavigate();
+  const userData = useSelector((state) => state?.auth?.data);
 
   useEffect(() => {
-    const savedCartItems = JSON.parse(localStorage.getItem("cartItems")) || [];
-    setCartItems(savedCartItems);
+    // Dynamically load the Razorpay script
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.onload = () => {
+      console.log("Razorpay script loaded successfully");
+    };
+    script.onerror = (err) => {
+      console.error("Failed to load Razorpay script", err);
+    };
+    document.body.appendChild(script);
+
+    // Clean up by removing the script when the component unmounts
+    return () => {
+      document.body.removeChild(script);
+    };
   }, []);
 
-  const handleRemoveItem = (name) => {
-    const updatedCartItems = cartItems.filter((item) => item.name !== name);
-    localStorage.setItem("cartItems", JSON.stringify(updatedCartItems));
-    setCartItems(updatedCartItems);
-    toast.success(`${name} removed from the cart!`);
+  const calculateTotalCost = () => {
+    return cartItems.reduce((total, item) => total + item.price * item.weight, 0);
   };
 
   const handleQuantityChange = (name, newWeight) => {
@@ -24,20 +37,86 @@ const CartPage = () => {
       toast.error("Value must be in the range from 0 to 10");
       return;
     }
-    
-    const updatedCartItems = cartItems.map((item) =>
-      item.name === name ? { ...item, weight: newWeight } : item
-    );
-    localStorage.setItem("cartItems", JSON.stringify(updatedCartItems));
-    setCartItems(updatedCartItems);
+    dispatch(updateItemQuantity({ name, weight: newWeight }));
   };
 
-  const calculateTotalCost = () => {
-    console.log(cartItems); // Debugging
-    return cartItems.reduce((total, item) => {
-      console.log(`Calculating: ${item.name}, Price: ${item.price}, Weight: ${item.weight}`); // Debugging
-      return total + item.price * item.weight; // Assuming item.price is in ₹/kg
-    }, 0);
+  const handlePayment = async () => {
+    const amount = calculateTotalCost();
+    if (amount === 0) {
+      toast.error("Your cart is empty.");
+      return;
+    }
+  
+    const userId = userData?._id; 
+    const items = cartItems; 
+  
+    if (!userId || !items || items.length === 0) {
+      toast.error("Missing user information or cart items.");
+      return;
+    }
+  
+    const resultAction = await dispatch(createOrder({ userId, items, totalAmount: amount }));
+    
+    if (createOrder.fulfilled.match(resultAction)) {
+      const { orderId, amount  } = resultAction.payload; // Order details from backend
+     
+      const options = {
+        key: "rzp_test_mlmuwmF5W32yav", // Replace with your Razorpay key
+        amount,
+        currency: "INR",
+        name: "FarmToMarket",
+        description: "Test Transaction",
+        order_id: orderId, 
+        handler: function (response) {
+      
+          const { razorpay_payment_id, razorpay_order_id, razorpay_signature } = response;
+      
+          // Ensure that all required details are present
+          if (!razorpay_payment_id || !razorpay_order_id || !razorpay_signature) {
+            toast.error("Missing payment details in the response.");
+            console.error("Missing data:", response);
+            return;
+          }
+    
+      
+          dispatch(verifyPayment({
+            paymentId: razorpay_payment_id,
+            orderId: razorpay_order_id,
+            signature: razorpay_signature, // Pass the signature to the backend
+          }))
+            .then((response) => {
+              if (response.payload.success) {
+                toast.success("Payment Verified!");
+                dispatch(clearCart());
+                navigate("/");
+              } else {
+                toast.error("Payment verification failed. Please try again.");
+                console.error("Payment verification failed:", response.payload);
+              }
+            })
+            .catch((error) => {
+              toast.error("Something went wrong while verifying the payment.");
+              console.error("Error during payment verification:", error);
+            });
+        },
+        prefill: {
+          name: userData.fullname,
+          email: userData.email,
+        },
+        theme: {
+          color: "#004526",
+        },
+      };
+      
+      const rzp = new window.Razorpay(options);
+      rzp.open();
+      
+      rzp.on("payment.failed", function (response) {
+        toast.error("Payment failed. Please try again.");
+        console.error("Payment failed response:", response.error);
+      });
+
+    } 
   };
 
   return (
@@ -80,7 +159,7 @@ const CartPage = () => {
                 </div>
                 <div className="mt-auto flex justify-center w-full">
                   <button
-                    onClick={() => handleRemoveItem(item.name)}
+                    onClick={() => dispatch(removeItem(item.name))}
                     className="bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-red-700"
                   >
                     Remove Item
@@ -93,16 +172,20 @@ const CartPage = () => {
             <h3 className="text-xl font-semibold">
               Total Cost: ₹{calculateTotalCost().toFixed(2)}
             </h3>
+            <button
+              onClick={handlePayment}
+              disabled={loading || paymentLoading}
+              className={`bg-[#004526] text-white px-4 py-2 mt-4 rounded-lg ${
+                loading || paymentLoading ? "opacity-50 cursor-not-allowed" : "hover:bg-[#004530]"
+              }`}
+            >
+              {loading || paymentLoading ? "Processing..." : "Proceed to Payment"}
+            </button>
           </div>
+          {error && <p className="text-red-500 mt-4">{error}</p>}
+          {paymentError && <p className="text-red-500 mt-4">{paymentError}</p>}
         </section>
       </main>
-
-      <div className="text-center my-8">
-        <Link to="/" className="inline-block bg-[#004526] text-white px-4 py-3 rounded-full hover:bg-[#004530] hover:scale-110 transition-all duration-200">
-          Back To Home
-        </Link>
-      </div>
-      <Footer />
     </div>
   );
 };
