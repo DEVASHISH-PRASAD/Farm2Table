@@ -9,7 +9,7 @@ import productRoutes from "./routes/productRoute.js";
 import miscRoute from "./routes/miscRoutes.js"
 import orderRoutes from "./routes/orderRoutes.js"
 import adminRoutes from "./routes/adminRoutes.js"
-import { isLoggedIn,allowedRoles } from "./middlewares/authMiddleware.js";
+import { isLoggedIn, authorizeRoles } from "./middlewares/authMiddleware.js";
 
 
 
@@ -33,7 +33,7 @@ app.use("/api/v1/user", userRoutes);
 app.use("/api/v1/product", productRoutes);
 app.use("/api/v1",miscRoute)
 app.use('/api/v1/orders',orderRoutes)
-app.use("/api/v1/admin",isLoggedIn,allowedRoles("ADMIN"),adminRoutes);
+app.use("/api/v1/admin",isLoggedIn,authorizeRoles("ADMIN"),adminRoutes);
 
 
 app.get("*", (req, res) => {
