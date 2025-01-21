@@ -2,7 +2,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import toast from "react-hot-toast";
 import axiosInstance from "../../Helpers/axiosInstance.js";
 
-export const createItem = createAsyncThunk('/product/createItem', async (data) => {
+export const createItem = createAsyncThunk('/admin/createItem', async (data) => {
     try {
         let res = await toast.promise(
             axiosInstance.post('/product/createitem', data), {

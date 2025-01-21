@@ -12,6 +12,7 @@ const CartPage = () => {
 
   useEffect(() => {
     // Dynamically load the Razorpay script
+    
     const script = document.createElement("script");
     script.src = "https://checkout.razorpay.com/v1/checkout.js";
     script.onload = () => {
@@ -22,16 +23,17 @@ const CartPage = () => {
     };
     document.body.appendChild(script);
 
-    // Clean up by removing the script when the component unmounts
     return () => {
       document.body.removeChild(script);
     };
   }, []);
 
+  // Calculate the total cost of the cart
   const calculateTotalCost = () => {
     return cartItems.reduce((total, item) => total + item.price * item.weight, 0);
   };
 
+  // Handle quantity change in cart items
   const handleQuantityChange = (name, newWeight) => {
     if (newWeight < 0 || newWeight > 10) {
       toast.error("Value must be in the range from 0 to 10");
@@ -40,49 +42,46 @@ const CartPage = () => {
     dispatch(updateItemQuantity({ name, weight: newWeight }));
   };
 
+  // Handle payment process
   const handlePayment = async () => {
     const amount = calculateTotalCost();
     if (amount === 0) {
       toast.error("Your cart is empty.");
       return;
     }
-  
-    const userId = userData?._id; 
-    const items = cartItems; 
-  
+
+    const userId = userData?._id;
+    const items = cartItems;
+
     if (!userId || !items || items.length === 0) {
       toast.error("Missing user information or cart items.");
       return;
     }
-  
+
     const resultAction = await dispatch(createOrder({ userId, items, totalAmount: amount }));
-    
+
     if (createOrder.fulfilled.match(resultAction)) {
-      const { orderId, amount  } = resultAction.payload; // Order details from backend
-     
+      const { orderId, amount } = resultAction.payload; // Order details from backend
+
       const options = {
         key: "rzp_test_mlmuwmF5W32yav", // Replace with your Razorpay key
         amount,
         currency: "INR",
         name: "FarmToMarket",
         description: "Test Transaction",
-        order_id: orderId, 
+        order_id: orderId,
         handler: function (response) {
-      
           const { razorpay_payment_id, razorpay_order_id, razorpay_signature } = response;
-      
-          // Ensure that all required details are present
+
           if (!razorpay_payment_id || !razorpay_order_id || !razorpay_signature) {
             toast.error("Missing payment details in the response.");
-            console.error("Missing data:", response);
             return;
           }
-    
-      
+
           dispatch(verifyPayment({
             paymentId: razorpay_payment_id,
             orderId: razorpay_order_id,
-            signature: razorpay_signature, // Pass the signature to the backend
+            signature: razorpay_signature,
           }))
             .then((response) => {
               if (response.payload.success) {
@@ -102,21 +101,20 @@ const CartPage = () => {
         prefill: {
           name: userData.fullname,
           email: userData.email,
+          phone: userData.phone,
         },
         theme: {
           color: "#004526",
         },
       };
-      
+
       const rzp = new window.Razorpay(options);
       rzp.open();
-      
+
       rzp.on("payment.failed", function (response) {
         toast.error("Payment failed. Please try again.");
-        console.error("Payment failed response:", response.error);
       });
-
-    } 
+    }
   };
 
   return (

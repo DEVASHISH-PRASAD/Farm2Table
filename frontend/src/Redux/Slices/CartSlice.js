@@ -17,9 +17,9 @@ export const createOrder = createAsyncThunk(
 // Async thunk for verifying payment
 export const verifyPayment = createAsyncThunk(
   "cart/verify-payment",
-  async ({ paymentId,orderId,signature}, { rejectWithValue }) => {
+  async ({ paymentId, orderId, signature }, { rejectWithValue }) => {
     try {
-      const response = await axios.post("/orders/verify-payment", { paymentId,orderId,signature});
+      const response = await axios.post("/orders/verify-payment", { paymentId, orderId, signature });
       return response.data; // Return verification result
     } catch (error) {
       return rejectWithValue(error.response?.data || "Payment verification failed");
@@ -30,7 +30,7 @@ export const verifyPayment = createAsyncThunk(
 const CartSlice = createSlice({
   name: "cart",
   initialState: {
-    items: JSON.parse(localStorage.getItem("cartItems")) || [],
+    items: JSON.parse(localStorage.getItem("cartItems")) || [],  // Get items from localStorage or default to empty array
     loading: false,
     error: null,
     paymentLoading: false,
@@ -40,27 +40,37 @@ const CartSlice = createSlice({
     addItem: (state, action) => {
       const existingItem = state.items.find((item) => item.name === action.payload.name);
       if (existingItem) {
-        existingItem.weight += action.payload.weight;
+        // Update the weight immutably
+        existingItem.weight = existingItem.weight + action.payload.weight;
       } else {
-        state.items.push(action.payload);
+        state.items = [...state.items, action.payload];
       }
-      localStorage.setItem("cartItems", JSON.stringify(state.items));
+      // Log the updated state for debugging purposes
+      console.log("Updated cart (addItem):", state.items);
+      localStorage.setItem("cartItems", JSON.stringify(state.items));  // Update localStorage after state change
     },
     removeItem: (state, action) => {
+      // Immutably update the items array
       state.items = state.items.filter((item) => item.name !== action.payload);
-      localStorage.setItem("cartItems", JSON.stringify(state.items));
+      // Log the updated state for debugging purposes
+      console.log("Updated cart (removeItem):", state.items);
+      localStorage.setItem("cartItems", JSON.stringify(state.items));  // Update localStorage
     },
     updateItemQuantity: (state, action) => {
       const { name, weight } = action.payload;
-      const existingItem = state.items.find((item) => item.name === name);
-      if (existingItem) {
-        existingItem.weight = weight;
-      }
-      localStorage.setItem("cartItems", JSON.stringify(state.items));
+      const updatedItems = state.items.map((item) =>
+        item.name === name ? { ...item, weight } : item
+      );
+      state.items = updatedItems;
+      // Log the updated state for debugging purposes
+      console.log("Updated cart (updateItemQuantity):", state.items);
+      localStorage.setItem("cartItems", JSON.stringify(state.items));  // Update localStorage
     },
     clearCart: (state) => {
       state.items = [];
-      localStorage.removeItem("cartItems");
+      localStorage.removeItem("cartItems"); // Clear cart in localStorage
+      // Log the action for debugging purposes
+      console.log("Cart cleared");
     },
   },
   extraReducers: (builder) => {

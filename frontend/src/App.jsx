@@ -16,6 +16,9 @@ import Dashboard from "./Pages/Dashboard";
 import CreateItem from "./admin/CreateItem";
 import AccessDenied from "./Pages/AccessDenied";
 import RequireAuth from "./components/RequireAuth";
+import AdminUserManagement from "./Pages/Admin/AdminUserManagement";
+import RequestResetPasswordPage from "./Pages/User/RequestResetPasswordPage";
+import ResetPasswordPage from "./Pages/User/ResetPasswordPage"
 
 function App() {
   return (
@@ -38,6 +41,9 @@ function App() {
 
         <Route path="/signup" element={<Signup />}></Route>
         <Route path="/login" element={<LoginPage />}></Route>
+        <Route path="/forgotPassword" element={<RequestResetPasswordPage />}></Route>
+        <Route path="/reset-password" element={<ResetPasswordPage />}></Route>
+
 
         <Route path="/vegetable" element={<VegetablesPage />}></Route>
         <Route path="/fruits" element={<FruitsPage />}></Route>
@@ -45,9 +51,12 @@ function App() {
 
         <Route path="/denied" element={<AccessDenied />}></Route>
 
+          
         <Route element={<RequireAuth allowedRoles={["ADMIN"]} />}>
           <Route path="/createItem" element={<CreateItem />}></Route>
+          <Route path="/adminUserManagement" element={<AdminUserManagement/>}></Route>
         </Route>
+        
       </Routes>
     </>
   );

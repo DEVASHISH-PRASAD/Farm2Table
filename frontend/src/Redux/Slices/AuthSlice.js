@@ -8,6 +8,51 @@ const initialState = {
   data: JSON.parse(localStorage.getItem("data") || "{}"),
 };
 
+
+export const requestResetPassword = createAsyncThunk(
+  "/auth/request-reset-password",
+  async (email, { rejectWithValue }) => {
+    try {
+      const res = await toast.promise(
+        axiosInstance.post("user/request-password-reset", { email }),
+        {
+          loading: "Sending password reset email...",
+          success: "Password reset email sent!",
+          error: "Failed to send password reset email!",
+        },
+        { toastId: "requestReset" }
+      );
+      return res.data;
+    } catch (error) {
+      toast.error(error?.response?.data?.message);
+      return rejectWithValue(error?.response?.data?.message);
+    }
+  }
+);
+
+// Reset Password
+export const resetPassword = createAsyncThunk(
+  "/auth/reset-password",
+  async ({ resetToken, newPassword }, { rejectWithValue }) => {
+    try {
+      const res = await toast.promise(
+        axiosInstance.post(`user/reset-password?resetToken=${resetToken}`, { newPassword }),
+        {
+          loading: "Resetting your password...",
+          success: "Password reset successful!",
+          error: "Failed to reset password!",
+        },
+        { toastId: "resetSuccess" }
+      );
+      return res.data;
+    } catch (error) {
+      toast.error(error?.response?.data?.message);
+      return rejectWithValue(error?.response?.data?.message);
+    }
+  }
+);
+
+
 export const createAccount = createAsyncThunk("/auth/signup", async (data) => {
   try {
     const res = await toast.promise(axiosInstance.post("user/register", data), {
@@ -107,6 +152,20 @@ const authSlice = createSlice({
         state.data = {};
         state.isLoggedIn = false;
         state.role = "";
+      })
+      // Handle the requestResetPassword action
+      .addCase(requestResetPassword.fulfilled, (state, action) => {
+      
+      })
+      .addCase(requestResetPassword.rejected, (state, action) => {
+        
+      })
+      // Handle the resetPassword action
+      .addCase(resetPassword.fulfilled, (state, action) => {
+       
+      })
+      .addCase(resetPassword.rejected, (state, action) => {
+      
       });
   },
 });

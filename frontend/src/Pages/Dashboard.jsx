@@ -6,7 +6,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../Redux/Slices/AuthSlice";
 import Header from "./Header";
 
-
 const Dashboard = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -18,7 +17,7 @@ const Dashboard = () => {
 
   return (
     <div>
-      <Header/>
+      <Header />
       <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
         <div className="flex flex-col items-center pt-2 p-14 max-w-md mx-auto bg-white shadow-lg rounded-lg relative">
           <button
@@ -57,18 +56,24 @@ const Dashboard = () => {
             </button>
           )}
           {userData.role === "ADMIN" && (
-            <button
-              onClick={() => navigate("/createItem")}
-              className="mt-6 px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
-            >
-              Add Product
-            </button>
+            <>
+              <button
+                onClick={() => navigate("/createItem")}
+                className="mt-6 px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+              >
+                Add Product
+              </button>
+              <button
+                onClick={() => navigate("/adminUserManagement")}
+                className="mt-4 px-4 py-2 bg-green-500 text-white font-semibold rounded-lg shadow-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
+              >
+                User Management
+              </button>
+            </>
           )}
           <button
-            onClick={() => {
-              handleLogout();
-            }}
-            className="mt-6 px-4 py-2 bg-red-500 text-white font-semibold rounded-lg shadow-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+            onClick={handleLogout}
+            className="mt-6 px-4 py-2 bg-red-500 text-white font-semibold rounded-lg shadow-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50"
           >
             Logout
           </button>

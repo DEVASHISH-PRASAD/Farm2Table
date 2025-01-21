@@ -19,10 +19,6 @@ const userSchema = new Schema(
       lowercase: true,
       trim: true,
       unique: true,
-      match: [
-        /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-        "Please fill a valid email address",
-      ],
     },
     password: {
       type: String,
@@ -30,7 +26,7 @@ const userSchema = new Schema(
       minLength: [8, "Password must be at least 8 characters!!"],
     },
     phone: {
-      type: Number,
+      type: String, // Changed from Number to String
       required: [true, "Phone number is required!"],
     },
     role: {
@@ -39,55 +35,46 @@ const userSchema = new Schema(
       default: "CUSTOMER",
     },
     avatar: {
-      public_id: {
-        type: String,
-      },
-      secure_url: {
-        type: String,
-      },
+      public_id: String,
+      secure_url: String,
     },
     forgotPasswordToken: String,
     forgotPasswordExpiry: Date,
+    forgotPasswordUsed: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );
 
+// Prevent double hashing of password
 userSchema.pre("save", async function (next) {
-  if (this.isModified("password")) {
+  if (this.isModified("password") && !this.password.startsWith("$2a$")) {
     try {
-      const hashedPassword = await bcrypt.hash(this.password, 10);
-      console.log("Hashed Password:",hashedPassword);
-      this.password=hashedPassword
-
-      next();
+      this.password = await bcrypt.hash(this.password, 10);
     } catch (err) {
-      next(err);
+      return next(err);
     }
-  } else {
-    next();
   }
+  next();
 });
 
+// User Methods
 userSchema.methods = {
-  generateJWTToken: async function () {
+  generateJWTToken: function () {
     return JWT.sign(
-      {
-        id: this._id,
-        email: this.email,
-        role: this.role,
-      },
+      { id: this._id, email: this.email, role: this.role },
       process.env.JWT_SECRET,
-      {
-        expiresIn: process.env.JWT_EXPIRY,
-      }
+      { expiresIn: process.env.JWT_EXPIRY }
     );
   },
-  comparePassword: async function (plainTextPassword) {
-    console.log("Compairing:",plainTextPassword,this.password);
-    
-    return await bcrypt.compare(plainTextPassword, this.password);
+
+  comparePassword: function (plainTextPassword) {
+    return bcrypt.compare(plainTextPassword, this.password);
   },
-  generatePasswordResetToken: async function () {
+
+  generatePasswordResetToken: function () {
     const resetToken = crypto.randomBytes(20).toString("hex");
 
     this.forgotPasswordToken = crypto
@@ -95,6 +82,7 @@ userSchema.methods = {
       .update(resetToken)
       .digest("hex");
     this.forgotPasswordExpiry = Date.now() + 15 * 60 * 1000; // 15 minutes
+
     return resetToken;
   },
 };
