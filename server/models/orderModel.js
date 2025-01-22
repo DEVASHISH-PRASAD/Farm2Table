@@ -54,9 +54,24 @@ const orderSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    delivered: {
+      type: Boolean,
+      default: false,
+    },
+    deliveryStatus: {  // New field added for delivery status
+      type: String,
+      enum: ['Not Dispatched', 'Shipped', 'In Transit', 'Out for Delivery', 'Delivered'],
+      default: 'Not Dispatched',
+    },
+    paymentMethod: {  // New field added for payment method
+      type: String,
+      enum: ['Credit Card', 'Debit Card', 'Net Banking', 'UPI', 'Cash on Delivery'],
+      default: 'Credit Card',
+      required: true,
+    },
   },
   {
-    timestamps: true, // Automatically adds 'createdAt' and 'updatedAt'
+    timestamps: true, 
   }
 );
 

@@ -61,7 +61,7 @@ const Dashboard = () => {
               <p className="text-left">{userData.role}</p>
             </div>
           </div>
-          {userData.role === "CUSTOMER" && (
+          {userData.role  && (
             <button
               onClick={() => navigate("/previous-order")}
               className="mt-6 px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
@@ -73,7 +73,7 @@ const Dashboard = () => {
             <>
               <button
                 onClick={() => navigate("/createItem")}
-                className="mt-6 px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+                className="mt-3 px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
               >
                 Add Product
               </button>

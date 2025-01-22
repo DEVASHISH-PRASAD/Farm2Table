@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import AOS from "aos";
-import { FaUserCircle } from "react-icons/fa";
+import { IoCartOutline } from "react-icons/io5";
 import img from "../assets/bgImage.jpg";
 import veg from "../assets/veg.jpeg";
 import dairy from "../assets/dairy.jpeg";
@@ -8,7 +8,7 @@ import fruits from "../assets/fruits.jpeg";
 import farm from "../assets/logo.png";
 import farm2 from "../assets/farm2.jpeg";
 import farm3 from "../assets/farm3.jpeg";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { getUserData, logout } from "../Redux/Slices/AuthSlice";
 
@@ -16,6 +16,7 @@ const HomePage = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
+  const [cartCount, setCartCount] = useState(0); // Cart count state
   const userData = useSelector((state) => state?.auth?.data);
   const isLoggedIn = useSelector((state) => state?.auth?.isLoggedIn);
   const dispatch = useDispatch();
@@ -43,6 +44,19 @@ const HomePage = () => {
     },
   ];
 
+   useEffect(() => {
+      if (isLoggedIn) {
+        dispatch(getUserData());
+      }
+  
+      // Update cart count from localStorage
+      const cartItems = JSON.parse(localStorage.getItem("cartItems")) || [];
+      const totalCount = cartItems.reduce(
+        (sum, item) => sum + (item.weight > 0 ? 1 : 0),
+        0
+      );
+      setCartCount(totalCount);
+    }, [dispatch, isLoggedIn]);
  useEffect(() => {
   if (isLoggedIn) {
     dispatch(getUserData());
@@ -146,6 +160,14 @@ const HomePage = () => {
                 />
               </a>
             )}
+            {isLoggedIn&&( <Link to="/cart" className="relative flex items-center">
+                        <IoCartOutline className="w-8 h-8 cursor-pointer text-white" />
+                        {cartCount > 0 && (
+                          <span className="absolute top-0 right-0 inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-red-500 rounded-full">
+                            {cartCount}
+                          </span>
+                        )}
+                      </Link>)}
           </nav>
         </div>
 

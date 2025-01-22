@@ -5,6 +5,6 @@ const router = express.Router();
 
 router.post('/create-order', createOrder);
 router.post('/verify-payment', verifyPayment);
-router.get('/user/:userId', getUserOrders);
+router.get('/previous/:id', getUserOrders);
 
 export default router;

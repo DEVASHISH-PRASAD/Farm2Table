@@ -19,6 +19,7 @@ import RequireAuth from "./components/RequireAuth";
 import AdminUserManagement from "./Pages/Admin/AdminUserManagement";
 import RequestResetPasswordPage from "./Pages/User/RequestResetPasswordPage";
 import ResetPasswordPage from "./Pages/User/ResetPasswordPage"
+import PreviousOrder from "./Pages/Cart/PreviousOrder";
 
 function App() {
   useEffect(() => {
@@ -40,6 +41,7 @@ function App() {
         >
           <Route path="/dashboard" element={<Dashboard/>}></Route>
           <Route path="/cart" element={<CartPage />}></Route>
+          <Route path="/previous-order" element={<PreviousOrder />}></Route>
         </Route>
 
         <Route path="/aboutUs" element={<AboutUs />}></Route>

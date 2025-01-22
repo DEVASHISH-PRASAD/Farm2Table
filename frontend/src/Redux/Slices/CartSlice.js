@@ -27,6 +27,28 @@ export const verifyPayment = createAsyncThunk(
   }
 );
 
+export const getPreviousOrders = createAsyncThunk(
+  "orders/getPreviousOrders",
+  async (id, { rejectWithValue }) => {
+    try {
+      // Validate userId before making the request
+      if (!id) {
+        return rejectWithValue("User ID is required");
+      }
+
+      // Fetch orders from API
+      const response = await axios.get(`/orders/previous/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error(" Error fetching previous orders:", error.message);
+      
+      return rejectWithValue(
+        error.response?.data || error.message || "Failed to fetch orders"
+      );
+    }
+  }
+);
+
 const CartSlice = createSlice({
   name: "cart",
   initialState: {
@@ -75,6 +97,7 @@ const CartSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      // Handle createOrder states
       .addCase(createOrder.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -86,6 +109,8 @@ const CartSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
+
+      // Handle verifyPayment states
       .addCase(verifyPayment.pending, (state) => {
         state.paymentLoading = true;
         state.paymentError = null;
@@ -96,6 +121,23 @@ const CartSlice = createSlice({
       .addCase(verifyPayment.rejected, (state, action) => {
         state.paymentLoading = false;
         state.paymentError = action.payload;
+      })
+
+      // Handle getPreviousOrders states
+      .addCase(getPreviousOrders.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getPreviousOrders.fulfilled, (state, action) => {
+        console.log("Redux received orders:", action.payload);
+        state.loading = false;
+        
+        // Ensure `previousOrders` is always an array
+        state.previousOrders = Array.isArray(action.payload) ? action.payload : [];
+      })
+      .addCase(getPreviousOrders.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       });
   },
 });
