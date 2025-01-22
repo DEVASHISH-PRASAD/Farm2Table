@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import { FaRegArrowAltCircleLeft } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import Footer from "./Footer";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../Redux/Slices/AuthSlice";
 import Header from "./Header";
+import AOS from "aos";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -14,12 +15,19 @@ const Dashboard = () => {
   function handleLogout() {
     dispatch(logout());
   }
+    useState(() => {
+      AOS.init({
+        duration: 1000,
+        once: false,
+        mirror: false,
+      });
+    });
 
   return (
-    <div>
-      <Header />
-      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-        <div className="flex flex-col items-center pt-2 p-14 max-w-md mx-auto bg-white shadow-lg rounded-lg relative">
+    
+      <div className="flex flex-col  min-h-screen bg-gray-100">
+       <Header className="w-full"/>
+        <div className="flex flex-col items-center pt-2 mt-6 mb-6 p-14 max-w-md mx-auto bg-white shadow-lg rounded-lg relative">
           <button
             className="absolute left-4 top-4 flex items-center justify-center text-gray-700 hover:text-gray-900"
             onClick={() => navigate(-1)}
@@ -78,9 +86,8 @@ const Dashboard = () => {
             Logout
           </button>
         </div>
+        <Footer />
       </div>
-      <Footer />
-    </div>
   );
 };
 
