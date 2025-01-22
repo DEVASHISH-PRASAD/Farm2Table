@@ -27,7 +27,7 @@ const Dashboard = () => {
     
       <div className="flex flex-col  min-h-screen bg-gray-100">
        <Header className="w-full"/>
-        <div className="flex flex-col items-center pt-2 mt-6 mb-6 p-14 max-w-md mx-auto bg-white shadow-lg rounded-lg relative">
+        <div className="flex flex-col items-center mt-6 mb-6 overflow-x-auto overflow-y-auto p-3.5 max-w-md mx-auto bg-white shadow-lg rounded-lg relative ">
           <button
             className="absolute left-4 top-4 flex items-center justify-center text-gray-700 hover:text-gray-900"
             onClick={() => navigate(-1)}
@@ -41,6 +41,12 @@ const Dashboard = () => {
               alt="Profile"
               className="w-40 m-auto rounded-full border-4 border-gray-300 shadow-lg"
             />
+            <button
+            onClick={handleLogout}
+            className="absolute right-4 top-4 flex items-center justify-center px-4 py-2 bg-red-500 text-white font-semibold rounded-lg shadow-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50"
+          >
+            Logout
+          </button>
             <h1 className="text-2xl font-bold mb-2 capitalize text-center">
               {userData.fullname}
             </h1>
@@ -79,12 +85,6 @@ const Dashboard = () => {
               </button>
             </>
           )}
-          <button
-            onClick={handleLogout}
-            className="mt-6 px-4 py-2 bg-red-500 text-white font-semibold rounded-lg shadow-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50"
-          >
-            Logout
-          </button>
         </div>
         <Footer />
       </div>

@@ -21,6 +21,13 @@ import RequestResetPasswordPage from "./Pages/User/RequestResetPasswordPage";
 import ResetPasswordPage from "./Pages/User/ResetPasswordPage"
 
 function App() {
+  useEffect(() => {
+    // Force the light mode by removing any dark class
+    document.body.classList.remove("dark");
+
+    // Optionally, you can add a class to the body for light mode explicitly
+    document.body.classList.add("light");
+  }, []);
   return (
     <>
       <Routes>

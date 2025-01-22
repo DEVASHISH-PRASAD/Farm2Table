@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { IoCartOutline } from "react-icons/io5";
 import AOS from "aos";
-import { getAllItems } from "../../Redux/Slices/ProductSlice"; 
+import { getAllItems, updateProductQuantity, updateProductPrice } from "../../Redux/Slices/ProductSlice";
 import Footer from "../Footer";
 import toast from "react-hot-toast";
 
@@ -12,6 +12,9 @@ const VegetablesPage = () => {
   const [cartCount, setCartCount] = useState(0);
   const [errors, setErrors] = useState({});
   const [category, setCategory] = useState("vegetables");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [updatedQuantities, setUpdatedQuantities] = useState({}); // To keep track of updated quantities
+  const [updatedPrices, setUpdatedPrices] = useState({}); // To keep track of updated prices
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -76,19 +79,22 @@ const VegetablesPage = () => {
 
     const currentCart = JSON.parse(localStorage.getItem("cartItems")) || [];
     const itemIndex = currentCart.findIndex((item) => item.name === name);
+    const price = items.find((item) => item.name === name).price;
+
     if (itemIndex > -1) {
       currentCart[itemIndex].weight = weight;
+      currentCart[itemIndex].totalCost = weight * price;
     } else {
       currentCart.push({
         name,
         weight,
-        price: items.find((item) => item.name === name).price,
+        price,
+        totalCost: weight * price,
       });
     }
 
     localStorage.setItem("cartItems", JSON.stringify(currentCart));
-    const updatedCartItems =
-      JSON.parse(localStorage.getItem("cartItems")) || [];
+    const updatedCartItems = JSON.parse(localStorage.getItem("cartItems")) || [];
     const totalCount = updatedCartItems.reduce(
       (sum, item) => sum + (item.weight > 0 ? 1 : 0),
       0
@@ -101,16 +107,67 @@ const VegetablesPage = () => {
     toast.success(`Added ${weight}kg of ${name} to the cart!`);
   };
 
+  const handleUpdateQuantity = (productId, quantity) => {
+    if (quantity <= 0 || isNaN(quantity)) {
+      toast.error("Please enter a valid quantity.");
+      return;
+    }
+
+    const confirmUpdate = window.confirm("Are you sure you want to update the quantity?");
+    if (confirmUpdate) {
+      dispatch(updateProductQuantity({ id: productId, quantity })).then(() => {
+        toast.success("Product quantity updated successfully!");
+        setUpdatedQuantities((prev) => ({
+          ...prev,
+          [productId]: quantity,
+        }));
+      }).catch(() => {
+        toast.error("Failed to update product quantity.");
+      });
+    }
+  };
+
+  // New method to handle price update
+  const handleUpdatePrice = (productId, price) => {
+    if (price <= 0 || isNaN(price)) {
+      toast.error("Please enter a valid price.");
+      return;
+    }
+
+    const confirmUpdate = window.confirm("Are you sure you want to update the price?");
+    if (confirmUpdate) {
+      dispatch(updateProductPrice({ id: productId, price })).then(() => {
+        toast.success("Product price updated successfully!");
+        setUpdatedPrices((prev) => ({
+          ...prev,
+          [productId]: price,
+        }));
+      }).catch(() => {
+        toast.error("Failed to update product price.");
+      });
+    }
+  };
+
+  // Filter items based on search term
+  const filteredItems = items.filter((item) =>
+    item.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <div className="min-h-screen bg-gray-100">
       <header className="bg-[#004526] text-white px-4 py-3">
         <div className="container mx-auto px-4 flex justify-between items-center">
           <h1 className="text-2xl md:text-4xl font-bold">Vegetables</h1>
+          
           <div className="flex items-center space-x-4">
-            <Link
-              to="/"
-              className="text-lg cursor-pointer text-white hover:text-gray-200"
-            >
+            <input
+              type="text"
+              placeholder="Search for a vegetable.."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="px-2 py-1 rounded-md text-black"
+            />
+            <Link to="/" className="text-lg cursor-pointer text-white hover:text-gray-200">
               Home
             </Link>
             <Link to="/cart" className="relative flex items-center">
@@ -125,46 +182,29 @@ const VegetablesPage = () => {
         </div>
       </header>
 
-      <section
-        className="container mx-auto px-4 py-8 md:py-16 text-sm"
-        data-aos="flip-left"
-      >
+      <section className="container mx-auto px-4 py-8 md:py-16 text-sm" data-aos="flip-left">
         <select
           className="md:text-3xl font-semibold mb-6 bg-gray-100"
           onChange={handleRoleChange}
         >
-          <option value="/vegetables" className="text-base">
-            Vegetable
-          </option>
-          <option value="/fruits" className="text-base">
-            Fruits
-          </option>
-          <option value="/grains" className="text-base">
-            Grains
-          </option>
+          <option value="/vegetables" className="text-base">Vegetables</option>
+          <option value="/fruits" className="text-base">Fruits</option>
+          <option value="/grains" className="text-base">Grains</option>
         </select>
+
         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
           {loading ? (
             <p>Loading...</p>
           ) : error ? (
             <p className="text-red-500">{error}</p>
           ) : (
-            items.map((item, index) => (
-              <div
-                key={index}
-                className="card bg-white shadow-lg p-4 flex flex-col items-center"
-              >
+            filteredItems.map((item, index) => (
+              <div key={index} className="card bg-white shadow-lg p-4 flex flex-col items-center">
                 <figure className="w-full mb-4">
-                  <img
-                    src={item.img.secure_url}
-                    alt={item.name}
-                    className="w-38 h-32 md:h-48 object-cover hover:scale-125 transition-all ease-in-out duration-300"
-                  />
+                  <img src={item.img.secure_url} alt={item.name} className="w-38 h-32 md:h-48 object-cover hover:scale-125 transition-all ease-in-out duration-300" />
                 </figure>
                 <h3 className="text-lg font-semibold">{item.name}</h3>
-                <p className="text-sm text-gray-700 mt-2">
-                  Price : ₹{item.price}/ (Kg/dozen)
-                </p>
+                <p className="text-sm text-gray-700 mt-2">Price : ₹{item.price}/{item.soldInPieces?"piece":(item.soldInDozen?"dozen":"Kg")}</p>
 
                 <div className="mt-4 flex items-center w-full">
                   <input
@@ -173,20 +213,12 @@ const VegetablesPage = () => {
                     max="10"
                     step="0.5"
                     value={weights[item.name] || ""}
-                    onChange={(e) =>
-                      handleWeightChange(item.name, e.target.value)
-                    }
+                    onChange={(e) => handleWeightChange(item.name, e.target.value)}
                     className="flex-1 p-2 border border-gray-300 rounded-l"
                   />
-                  <span className="p-2 border border-l-0 border-gray-300 rounded-r">
-                    Kg
-                  </span>
+                  <span className="p-2 border border-l-0 border-gray-300 rounded-r">{item.soldInPieces?"piece":(item.soldInDozen?"dozen":"Kg")}</span>
                 </div>
-                {errors[item.name] && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {errors[item.name]}
-                  </p>
-                )}
+                {errors[item.name] && <p className="text-red-500 text-sm mt-1">{errors[item.name]}</p>}
 
                 <button
                   onClick={() => handleAddToCart(item.name)}
@@ -194,30 +226,59 @@ const VegetablesPage = () => {
                 >
                   Add to Cart
                 </button>
+
+                {userData.role === "ADMIN" && (
+                  <div className="mt-4 flex items-center w-full">
+                    <input
+                      type="number"
+                      min="0"
+                      max="1000"
+                      step="1"
+                      value={updatedQuantities[item._id] || item.quantity}
+                      onChange={(e) => setUpdatedQuantities((prev) => ({ ...prev, [item._id]: e.target.value }))} 
+                      placeholder="Update Qty"
+                      className="flex-1 p-2 border border-gray-300 rounded-l"
+                    />
+                    <button
+                      onClick={() => handleUpdateQuantity(item._id, updatedQuantities[item._id])}
+                      className="p-2 ml-2 bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-700 transition"
+                    >
+                      Update Quantity
+                    </button>
+                  </div>
+                )}
+
+                {userData.role === "ADMIN" && (
+                  <div className="mt-4 flex items-center w-full">
+                    <input
+                      type="number"
+                      min="0"
+                      max="10000"
+                      step="1"
+                      value={updatedPrices[item._id] || item.price}
+                      onChange={(e) => setUpdatedPrices((prev) => ({ ...prev, [item._id]: e.target.value }))} 
+                      placeholder="Update Price"
+                      className="flex-1 p-2 border border-gray-300 rounded-l"
+                    />
+                    <button
+                      onClick={() => handleUpdatePrice(item._id, updatedPrices[item._id])}
+ className="p-2 ml-2 bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-700 transition"
+                    >
+                      Update Price
+                    </button>
+                  </div>
+                )}
               </div>
             ))
           )}
         </div>
       </section>
-      {userData.role === "ADMIN" ? (
-        <div className="text-center my-8">
-          <Link
-            to="/createItem"
-            className="inline-block bg-[#132b20] text-white px-4 py-3 rounded-full hover:bg-[#004530] hover:scale-110 transition-all duration-200"
-          >
-            Add New Product
-          </Link>
-        </div>
-      ) : (
-        <div className="text-center my-8">
-          <Link
-            to="/"
-            className="inline-block bg-[#004526] text-white px-4 py-3 rounded-full hover:bg-[#004530] hover:scale-110 transition-all duration-200"
-          >
-            Back To Home
-          </Link>
-        </div>
-      )}
+
+      <div className="text-center my-8">
+        <Link to="/" className="inline-block bg-[#004526] text-white px-8 py-4 rounded-full hover:bg-green-600 transition-all">
+          Back to Home
+        </Link>
+      </div>
       <Footer />
     </div>
   );

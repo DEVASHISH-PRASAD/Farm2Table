@@ -15,6 +15,7 @@ const CreateItem = () => {
     category: "",
     price: "",
     quantity: "",
+    quantityType: "kg", // Default to kg
     image: "",
   });
 
@@ -26,25 +27,24 @@ const CreateItem = () => {
     setFormData({ ...formData, [name]: value });
   };
 
-const getImage = (event) => {
-  event.preventDefault();
-  const uploadedImage = event.target.files[0];
+  const getImage = (event) => {
+    event.preventDefault();
+    const uploadedImage = event.target.files[0];
 
-  if (uploadedImage) {
-    if (uploadedImage.size > 5 * 1024 * 1024) { // 5MB limit
-      toast.error("File size exceeds 5MB.");
-      return;
+    if (uploadedImage) {
+      if (uploadedImage.size > 5 * 1024 * 1024) { // 5MB limit
+        toast.error("File size exceeds 5MB.");
+        return;
+      }
+
+      setFormData({ ...formData, image: uploadedImage });
+      const fileReader = new FileReader();
+      fileReader.readAsDataURL(uploadedImage);
+      fileReader.addEventListener("load", function () {
+        setItemImage(this.result);
+      });
     }
-
-    setFormData({ ...formData, image: uploadedImage });
-    const fileReader = new FileReader();
-    fileReader.readAsDataURL(uploadedImage);
-    fileReader.addEventListener("load", function () {
-      setItemImage(this.result);
-    });
-  }
-};
-
+  };
 
   useEffect(() => {
     AOS.init({
@@ -62,12 +62,12 @@ const getImage = (event) => {
     fData.append("category", formData.category);
     fData.append("price", formData.price);
     fData.append("quantity", formData.quantity);
+    fData.append("quantityType", formData.quantityType);
     fData.append("image", formData.image);
 
     const response = await dispatch(createItem(fData)).unwrap();
     if (response?.success) {
-      toast.success("Item created successfully!");
-      navigate("/products"); // Navigate to item listing or any other page
+      navigate("/products");
     } else {
       toast.error("Failed to create item.");
     }
@@ -78,6 +78,7 @@ const getImage = (event) => {
       category: "",
       price: "",
       quantity: "",
+      quantityType: "kg", // Reset quantity type to kg
       image: "",
     });
     setItemImage("");
@@ -86,7 +87,7 @@ const getImage = (event) => {
   return (
     <div className="min-h-screen flex flex-col bg-gray-100">
       <Header />
-      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 ">
+      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
         <div
           className="card w-full max-w-lg shadow-lg bg-white p-8 rounded-xl mt-4 mb-4"
           data-aos="flip-left"
@@ -183,16 +184,29 @@ const getImage = (event) => {
 
             <div className="form-control mb-4">
               <label className="label font-medium text-gray-700">
-                <span className="label-text">Quantity (kg)</span>
+                <span className="label-text">Quantity</span>
               </label>
-              <input
-                type="number"
-                name="quantity"
-                value={formData.quantity}
-                onChange={handleChange}
-                className="input input-bordered w-full px-4 py-2"
-                required
-              />
+              <div className="flex space-x-4">
+                <input
+                  type="number"
+                  name="quantity"
+                  value={formData.quantity}
+                  onChange={handleChange}
+                  className="input input-bordered w-1/2 px-4 py-2"
+                  required
+                />
+                <select
+                  name="quantityType"
+                  value={formData.quantityType}
+                  onChange={handleChange}
+                  className="select select-bordered w-1/2 px-4 py-2"
+                  required
+                >
+                  <option value="kg">Kg</option>
+                  <option value="pieces">Pieces</option>
+                  <option value="dozen">Dozen</option>
+                </select>
+              </div>
             </div>
 
             <div className="form-control mt-6">

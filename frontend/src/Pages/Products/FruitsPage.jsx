@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux"; 
+import { useDispatch, useSelector } from "react-redux";
 import AOS from "aos";
-import { getAllItems } from "../../Redux/Slices/ProductSlice"; 
+import { getAllItems, updateProductQuantity, updateProductPrice } from "../../Redux/Slices/ProductSlice";
 import { IoCartOutline } from "react-icons/io5";
 import Footer from "../Footer";
 import toast from "react-hot-toast";
@@ -11,7 +11,10 @@ const FruitsPage = () => {
   const [weights, setWeights] = useState({});
   const [cartCount, setCartCount] = useState(0);
   const [errors, setErrors] = useState({});
-  const [category, setCategory] = useState("fruits"); 
+  const [category, setCategory] = useState("fruits");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [updatedQuantities, setUpdatedQuantities] = useState({});
+  const [updatedPrices, setUpdatedPrices] = useState({}); // New state for updated prices
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -73,20 +76,20 @@ const FruitsPage = () => {
       toast.error(`Please enter a valid weight for ${name}`);
       return;
     }
-    
+
     const currentCart = JSON.parse(localStorage.getItem("cartItems")) || [];
     const itemIndex = currentCart.findIndex((item) => item.name === name);
-    const price = items.find((item) => item.name === name).price; 
+    const price = items.find((item) => item.name === name).price;
 
     if (itemIndex > -1) {
       currentCart[itemIndex].weight = weight;
-      currentCart[itemIndex].totalCost = weight * price; 
+      currentCart[itemIndex].totalCost = weight * price;
     } else {
       currentCart.push({
         name,
         weight,
         price,
-        totalCost: weight * price, 
+        totalCost: weight * price,
       });
     }
 
@@ -104,15 +107,70 @@ const FruitsPage = () => {
     toast.success(`Added ${weight}kg of ${name} to the cart!`);
   };
 
+  const handleUpdateQuantity = (productId, quantity) => {
+    if (quantity <= 0 || isNaN(quantity)) {
+      toast.error("Please enter a valid quantity.");
+      return;
+    }
+
+    const confirmUpdate = window.confirm("Are you sure you want to update the quantity?");
+    if (confirmUpdate) {
+      dispatch(updateProductQuantity({ id: productId, quantity })).then(() => {
+        toast.success("Product quantity updated successfully!");
+        setUpdatedQuantities((prev) => ({
+          ...prev,
+          [productId]: quantity,
+        }));
+      }).catch(() => {
+        toast.error("Failed to update product quantity.");
+      });
+    }
+  };
+
+  // Handle price update
+  const handleUpdatePrice = (productId, price) => {
+    if (price <= 0 || isNaN(price)) {
+      toast.error("Please enter a valid price.");
+      return;
+    }
+
+    const confirmUpdate = window.confirm("Are you sure you want to update the price?");
+    if (confirmUpdate) {
+      dispatch(updateProductPrice({ id: productId, price })).then(() => {
+        toast.success("Product price updated successfully!");
+        setUpdatedPrices((prev) => ({
+          ...prev,
+          [productId]: price,
+        }));
+      }).catch(() => {
+        toast.error("Failed to update product price.");
+      });
+    }
+  };
+
+  const filteredItems = items.filter((item) =>
+    item.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <div className="min-h-screen bg-gray-100">
       <header className="bg-[#004526] text-white px-4 py-3">
         <div className="container mx-auto px-4 flex justify-between items-center">
           <h1 className="text-2xl md:text-4xl font-bold">Fruits</h1>
+
           <div className="flex items-center space-x-4">
-            <Link to="/" className="text-lg cursor-pointer text-white hover:text-gray-200">
-              Home
-            </Link>
+            <div className="flex items-center space-x-4">
+              <input
+                type="text"
+                placeholder="Search for Fruits.."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="px-2 py-1 rounded-md text-black"
+              />
+              <Link to="/" className="text-lg cursor-pointer text-white hover:text-gray-200">
+                Home
+              </Link>
+            </div>
             <Link to="/cart" className="relative flex items-center">
               <IoCartOutline className="w-8 h-8 cursor-pointer text-white" />
               {cartCount > 0 && (
@@ -134,19 +192,20 @@ const FruitsPage = () => {
           <option value="/vegetable" className="text-base">Vegetables</option>
           <option value="/grains" className="text-base">Grains</option>
         </select>
+
         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
           {loading ? (
             <p>Loading...</p>
           ) : error ? (
             <p className="text-red-500">{error}</p>
           ) : (
-            items.map((item, index) => (
+            filteredItems.map((item, index) => (
               <div key={index} className="card bg-white shadow-lg p-4 flex flex-col items-center">
                 <figure className="w-full mb-4">
                   <img src={item.img.secure_url} alt={item.name} className="w-38 h-32 md:h-48 object-cover hover:scale-125 transition-all ease-in-out duration-300" />
                 </figure>
                 <h3 className="text-lg font-semibold">{item.name}</h3>
-                <p className="text-sm text-gray-700 mt-2">Price : ₹{item.price}/ (Kg/dozen)</p>
+                <p className="text-sm text-gray-700 mt-2">Price : ₹{item.price}/{item.soldInPieces?"piece":(item.soldInDozen?"dozen":"Kg")}</p>
 
                 <div className="mt-4 flex items-center w-full">
                   <input
@@ -158,7 +217,7 @@ const FruitsPage = () => {
                     onChange={(e) => handleWeightChange(item.name, e.target.value)}
                     className="flex-1 p-2 border border-gray-300 rounded-l"
                   />
-                  <span className="p-2 border border-l-0 border-gray-300 rounded-r">Kg</span>
+                  <span className="p-2 border border-l-0 border-gray-300 rounded-r">{item.soldInPieces?"piece":(item.soldInDozen?"dozen":"Kg")}</span>
                 </div>
                 {errors[item.name] && <p className="text-red-500 text-sm mt-1">{errors[item.name]}</p>}
 
@@ -168,25 +227,58 @@ const FruitsPage = () => {
                 >
                   Add to Cart
                 </button>
+
+                {userData.role === "ADMIN" && (
+                  <>
+                    <div className="mt-4 flex items-center w-full">
+                      <input
+                        type="number"
+                        min="0"
+                        max="1000"
+                        step="1"
+                        value={updatedQuantities[item._id] || item.quantity}
+                        onChange={(e) => setUpdatedQuantities((prev) => ({ ...prev, [item._id]: e.target.value }))} 
+                        placeholder="Update Qty"
+                        className="flex-1 p-2 border border-gray-300 rounded-l"
+                      />
+                      <button
+                        onClick={() => handleUpdateQuantity(item._id, updatedQuantities[item._id])}
+                         className="p-2 ml-2 bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-700 transition"
+                      >
+                        Update Quantity
+                      </button>
+                    </div>
+
+                    <div className="mt-4 flex items-center w-full">
+                      <input
+                        type="number"
+                        min="1"
+                        max="1000"
+                        value={updatedPrices[item._id] || item.price}
+                        onChange={(e) => setUpdatedPrices((prev) => ({ ...prev, [item._id]: e.target.value }))} 
+                        placeholder="Update Price"
+                        className="flex-1 p-2 border border-gray-300 rounded-l"
+                      />
+                      <button
+                        onClick={() => handleUpdatePrice(item._id, updatedPrices[item._id])}
+                       className="p-2 ml-2 bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-700 transition"
+                      >
+                        Update Price
+                      </button>
+                    </div>
+                  </>
+                )}
               </div>
             ))
           )}
         </div>
       </section>
 
-      {userData.role === "ADMIN" ? (
-        <div className="text-center my-8">
-          <Link to="/createItem" className="inline-block bg-[#132b20] text-white px-4 py-3 rounded-full hover:bg-[#004530] hover:scale-110 transition-all duration-200">
-            Add New Product
-          </Link>
-        </div>
-      ) : (
-        <div className="text-center my-8">
-          <Link to="/" className="inline-block bg-[#004526] text-white px-4 py-3 rounded-full hover:bg-[#004530] hover:scale-110 transition-all duration-200">
-            Back To Home
-          </Link>
-        </div>
-      )}
+      <div className="text-center my-8">
+        <Link to="/" className="inline-block bg-[#004526] text-white px-8 py-4 rounded-full hover:bg-green-600 transition-all">
+          Back to Home
+        </Link>
+      </div>
       <Footer />
     </div>
   );

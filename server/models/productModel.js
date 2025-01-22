@@ -1,4 +1,4 @@
-import mongoose from 'mongoose'
+import mongoose from 'mongoose';
 
 const itemSchema = new mongoose.Schema({
   name: {
@@ -16,18 +16,30 @@ const itemSchema = new mongoose.Schema({
     },
   },
   price: {
-    type: String,  //String type to handle currency symbol
-    required: true, 
+    type: String, // String type to handle currency symbol
+    required: true,
   },
   category: {
     type: String,
-    enum: ['fruits', 'grains', 'vegetables'], 
+    enum: ['fruits', 'grains', 'vegetables'],
     required: true,
   },
   quantity: {
     type: Number,
     required: true,
-    default: 0, 
+    default: 0,
+  },
+  soldInPieces: {
+    type: Boolean,
+    default: false, // False by default
+  },
+  soldInDozen: {
+    type: Boolean,
+    default: false, // False by default
+  },
+  soldByWeight: {
+    type: Boolean,
+    default: true, // True by default
   },
   createdAt: {
     type: Date,
