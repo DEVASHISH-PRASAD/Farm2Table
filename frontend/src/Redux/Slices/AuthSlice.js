@@ -83,11 +83,7 @@ export const login = createAsyncThunk("/auth/login", async (data) => {
 
 export const getUserData = createAsyncThunk("/user/details", async () => {
   try {
-    const res = await toast.promise(axiosInstance.get("/user/me"), {
-      loading: "Fetching user details...",
-      success: "User details fetched successfully!",
-      error: (error) => error.message,
-    });
+    const res = await axiosInstance.get("/user/me"); 
     return res.data;
   } catch (error) {
     throw error;
