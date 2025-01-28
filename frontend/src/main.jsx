@@ -9,9 +9,8 @@ import { GoogleOAuthProvider } from "@react-oauth/google";
 
 createRoot(document.getElementById("root")).render(
   <Provider store={store}>
-    
   <BrowserRouter>
-  <GoogleOAuthProvider clientId="860336309878-8ff21gmiv94eb3gtt805jjcadufe5ssu.apps.googleusercontent.com">
+  <GoogleOAuthProvider clientId="492894863921-bjolqnsbhkeqrq4lj6jb1ug5h4tplprq.apps.googleusercontent.com">
     <App />
     <Toaster />
     </GoogleOAuthProvider>
