@@ -6,6 +6,12 @@ import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import { login } from "../Redux/Slices/AuthSlice";
 import { useNavigate } from "react-router-dom";
+import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+import firebaseConfig from "../../firebaseConfig"; // Assuming your Firebase config is here
+import { initializeApp } from "firebase/app";
+import { GoogleLogin } from "@react-oauth/google";
+import { jwtDecode } from "jwt-decode";
+
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
@@ -15,15 +21,15 @@ const LoginPage = () => {
 
   const loginUser = async (e) => {
     e.preventDefault();
-    const fData = {email,password}
+    const fData = { email, password };
 
     if (!email || !password) {
-      toast.error("Email and Password is required!!");
+      toast.error("Email and Password are required!");
       return;
     }
     const response = await dispatch(login(fData)).unwrap();
     if (response?.success) {
-      navigate("/");
+      navigate("/"); // Navigate to home or dashboard
     }
     setEmail("");
     setPassword("");
@@ -80,6 +86,30 @@ const LoginPage = () => {
               Login
             </button>
           </form>
+
+          {/* Google OAuth Button */}
+          <div className="flex items-center justify-center w-full text-center mt-2 rounded-sm font-semibold text-lg cursor-pointer">
+  <GoogleLogin
+    onSuccess={async (credentialResponse) => {
+      const res = jwtDecode(credentialResponse.credential);
+      const googleData = {
+        email: res.email,
+        password: res.sub, // Assuming you use Google ID as password
+      };
+
+      const response = await dispatch(login(googleData)).unwrap();
+      if (response?.success) {
+        navigate("/");
+      } else {
+        toast.error(response?.message || "Login failed");
+      }
+    }}
+    onError={() => {
+      toast.error("Login Failed");
+    }}
+  />
+</div>
+
           <div className="mt-4 text-center">
             <p className="text-sm text-gray-600">
               Don't have an account?{" "}
