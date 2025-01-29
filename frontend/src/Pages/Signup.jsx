@@ -10,7 +10,7 @@ import "react-phone-input-2/lib/style.css";
 import { initializeApp } from "firebase/app";
 import { getAuth, createUserWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
 import firebaseConfig from "../../firebaseConfig";
-import { jwtDecode } from "jwt-decode";  // Don't forget to import this
+import { jwtDecode } from "jwt-decode";  
 import Header from "./Header";
 import Footer from "./Footer";
 import AOS from "aos";
@@ -192,10 +192,9 @@ const SignupForm = () => {
             <div className="form-control mb-4">
               <label className="label font-medium text-gray-700">Phone</label>
               <PhoneInput
-                country={"us"}
+                country={"in"}
                 value={formData.phone}
                 onChange={(phone) => setFormData({ ...formData, phone })}
-                className="input input-bordered w-full px-4 py-2"
                 required
               />
             </div>

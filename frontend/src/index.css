@@ -2,66 +2,61 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Prevent dark mode from being applied */
-@media (prefers-color-scheme: dark) {
-    body {
-      background-color: white !important;
-      color: black !important;
-    }
-  }
-/* Global Styles for Light Mode */
+/* Global Light Mode Styles */
 body {
     background-color: white;
     color: black;
-    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     transition: background-color 0.3s, color 0.3s;
-  }
-  
-  /* Ensure form elements like input, textarea, select, etc., stay styled in light mode */
-  input,
-  textarea,
-  select {
+}
+
+/* Global Form Styles */
+input,
+textarea,
+select {
     background-color: white;
     color: black;
     padding: 8px;
     font-size: 16px;
     border-radius: 4px;
+    border: 1px solid #ccc;
     transition: background-color 0.3s, color 0.3s;
-  }
-  
-  /* Optional: Style on focus to ensure visibility */
-  input:focus,
-  textarea:focus,
-  select:focus {
+}
+
+/* Focus State */
+input:focus,
+textarea:focus,
+select:focus {
     outline: none;
     border-color: #007bff;
     box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
-  }
-  
-  /* Style text inside input and textarea for better readability */
-  input::placeholder,
-  textarea::placeholder {
+}
+
+/* Placeholder Color */
+input::placeholder,
+textarea::placeholder {
     color: #888;
-  }
-  
-  /* If using dark mode, ensure the inputs are styled accordingly */
-  body.dark input,
-  body.dark textarea,
-  body.dark select{
-    background-color: #121212; /* Dark background */
-    color: white; /* Light text color */
-  }
-  
-  body.dark input:focus,
-  body.dark textarea:focus,
-  body.dark select:focus {
+}
+
+/* ✅ Dark Mode - Activated when body has "dark" class */
+body.dark {
+    background-color: #121212;
+    color: white;
+}
+
+/* Dark Mode for Inputs */
+body.dark input,
+body.dark textarea,
+body.dark select {
+    background-color: #1e1e1e; /* Darker background */
+    color: white;
+    border-color: #555;
+}
+
+/* Dark Mode Input Focus */
+body.dark input:focus,
+body.dark textarea:focus,
+body.dark select:focus {
     border-color: #007bff;
     box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
-  }
-  
-  body.light input,
-  body.light textarea,
-  body.light select {
-    color: black;
-  }
-  
+}

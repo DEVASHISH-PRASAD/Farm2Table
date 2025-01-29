@@ -182,16 +182,28 @@ export const requestResetPassword = async (req, res) => {
 
     // Save the reset token and expiry to the user record
     await user.save();
-
-    // Create a reset password URL
     const resetUrl = `${process.env.FRONTEND_URI}/reset-password?resetToken=${resetToken}`;
 
-    // Send reset password email
-    const message = `You requested a password reset. Click the link below to reset your password:
-    \n\n${resetUrl}\n\n
-    If you did not request this, please ignore this email.`;
 
-    await sendEmail(user.email, "Password Reset Request", message);
+    const htmlMessage = `
+      <div style="font-family: Arial, sans-serif; line-height: 1.5; color: #333;">
+        <h2 style="color: #004526;">Password Reset Request</h2>
+        <p>Hello <strong>${user.fullname || "User"}</strong>,</p>
+        <p>We received a request to reset your password. Click the button below to proceed:</p>
+        <p style="text-align: center;">
+          <a href="${resetUrl}" 
+             style="display: inline-block; padding: 12px 20px; background-color: #004526; color: #fff; text-decoration: none; border-radius: 5px; font-weight: bold;">
+            Reset Your Password
+          </a>
+        </p>
+        <p>If you didn’t request this, you can safely ignore this email.</p>
+        <p>For security reasons, this link will expire in 15 minutes.</p>
+        <p>Best Regards,</p>
+        <p><strong>F2M Support Team</strong></p>
+      </div>
+    `;
+
+    await sendEmail(user.email, "Reset Your Password", htmlMessage, true);
 
     res.status(200).json({
       message: "Password reset link has been sent to your email!",
@@ -203,6 +215,7 @@ export const requestResetPassword = async (req, res) => {
     });
   }
 };
+
 
 // Controller to reset password
 export const resetPassword = async (req, res) => {
