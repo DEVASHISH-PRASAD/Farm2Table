@@ -180,8 +180,8 @@ const CartPage = () => {
               {loading || paymentLoading ? "Processing..." : "Proceed to Payment"}
             </button>
           </div>
-          {error && <p className="text-red-500 mt-4">{error}</p>}
-          {paymentError && <p className="text-red-500 mt-4">{paymentError}</p>}
+        
+
         </section>
       </main>
     </div>
