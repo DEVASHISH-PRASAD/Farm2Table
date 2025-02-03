@@ -13,7 +13,7 @@ const VegetablesPage = () => {
   const [errors, setErrors] = useState({});
   const [category, setCategory] = useState("vegetables");
   const [searchTerm, setSearchTerm] = useState("");
-  const [updatedQuantities, setUpdatedQuantities] = useState({}); // To keep track of updated quantities
+  const [updatedQuantities, setUpdatedQuantities] = useState({}); 
   const [updatedPrices, setUpdatedPrices] = useState({}); // To keep track of updated prices
 
   const navigate = useNavigate();
@@ -26,7 +26,7 @@ const VegetablesPage = () => {
   useEffect(() => {
     AOS.init({
       duration: 1000,
-      once: true,
+      once: false,
       mirror: false,
     });
 
@@ -158,16 +158,19 @@ const VegetablesPage = () => {
       <header className="bg-[#004526] text-white px-4 py-3">
         <div className="container mx-auto px-4 flex justify-between items-center">
           <h1 className="text-2xl md:text-4xl font-bold">Vegetables</h1>
-          
+
           <div className="flex items-center space-x-4">
             <input
               type="text"
-              placeholder="Search for a vegetable.."
+              placeholder="Search for Vegetables.."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="px-2 py-1 rounded-md text-black"
+              className="px-2 py-1 rounded-md text-black ml-2 w-full sm:w-48 md:w-64 lg:w-80"
             />
-            <Link to="/" className="text-lg cursor-pointer text-white hover:text-gray-200">
+            <Link
+              to="/"
+              className="text-lg cursor-pointer text-white hover:text-gray-200"
+            >
               Home
             </Link>
             <Link to="/cart" className="relative flex items-center">
@@ -182,14 +185,20 @@ const VegetablesPage = () => {
         </div>
       </header>
 
-      <section className="container mx-auto px-4 py-8 md:py-16 text-sm" data-aos="flip-left">
+      <section className="container mx-auto px-4 py-8 md:py-16 text-sm">
         <select
           className="md:text-3xl font-semibold mb-6 bg-gray-100"
           onChange={handleRoleChange}
         >
-          <option value="/vegetables" className="text-base">Vegetables</option>
-          <option value="/fruits" className="text-base">Fruits</option>
-          <option value="/grains" className="text-base">Grains</option>
+          <option value="/vegetables" className="text-base">
+            Vegetables
+          </option>
+          <option value="/fruits" className="text-base">
+            Fruits
+          </option>
+          <option value="/grains" className="text-base">
+            Grains
+          </option>
         </select>
 
         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
@@ -199,12 +208,27 @@ const VegetablesPage = () => {
             <p className="text-red-500">{error}</p>
           ) : (
             filteredItems.map((item, index) => (
-              <div key={index} className="card bg-white shadow-lg p-4 flex flex-col items-center">
+              <div
+                key={index}
+                className="card bg-white shadow-lg p-4 flex flex-col items-center"
+                data-aos="zoom-in"
+              >
                 <figure className="w-full mb-4">
-                  <img src={item.img.secure_url} alt={item.name} className="w-38 h-32 md:h-48 object-cover hover:scale-125 transition-all ease-in-out duration-300" />
+                  <img
+                    src={item.img.secure_url}
+                    alt={item.name}
+                    className="w-38 h-32 md:h-48 object-cover hover:scale-125 transition-all ease-in-out duration-300"
+                  />
                 </figure>
                 <h3 className="text-lg font-semibold">{item.name}</h3>
-                <p className="text-sm text-gray-700 mt-2">Price : ₹{item.price}/{item.soldInPieces?"piece":(item.soldInDozen?"dozen":"Kg")}</p>
+                <p className="text-sm text-gray-700 mt-2">
+                  Price : ₹{item.price}/
+                  {item.soldInPieces
+                    ? "piece"
+                    : item.soldInDozen
+                    ? "dozen"
+                    : "Kg"}
+                </p>
 
                 <div className="mt-4 flex items-center w-full">
                   <input
@@ -213,12 +237,24 @@ const VegetablesPage = () => {
                     max="10"
                     step="0.5"
                     value={weights[item.name] || ""}
-                    onChange={(e) => handleWeightChange(item.name, e.target.value)}
+                    onChange={(e) =>
+                      handleWeightChange(item.name, e.target.value)
+                    }
                     className="flex-1 p-2 border border-gray-300 rounded-l"
                   />
-                  <span className="p-2 border border-l-0 border-gray-300 rounded-r">{item.soldInPieces?"piece":(item.soldInDozen?"dozen":"Kg")}</span>
+                  <span className="p-2 border border-l-0 border-gray-300 rounded-r">
+                    {item.soldInPieces
+                      ? "piece"
+                      : item.soldInDozen
+                      ? "dozen"
+                      : "Kg"}
+                  </span>
                 </div>
-                {errors[item.name] && <p className="text-red-500 text-sm mt-1">{errors[item.name]}</p>}
+                {errors[item.name] && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {errors[item.name]}
+                  </p>
+                )}
 
                 <button
                   onClick={() => handleAddToCart(item.name)}
@@ -235,12 +271,22 @@ const VegetablesPage = () => {
                       max="1000"
                       step="1"
                       value={updatedQuantities[item._id] || item.quantity}
-                      onChange={(e) => setUpdatedQuantities((prev) => ({ ...prev, [item._id]: e.target.value }))} 
+                      onChange={(e) =>
+                        setUpdatedQuantities((prev) => ({
+                          ...prev,
+                          [item._id]: e.target.value,
+                        }))
+                      }
                       placeholder="Update Qty"
                       className="flex-1 p-2 border border-gray-300 rounded-l"
                     />
                     <button
-                      onClick={() => handleUpdateQuantity(item._id, updatedQuantities[item._id])}
+                      onClick={() =>
+                        handleUpdateQuantity(
+                          item._id,
+                          updatedQuantities[item._id]
+                        )
+                      }
                       className="p-2 ml-2 bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-700 transition"
                     >
                       Update Quantity
@@ -256,13 +302,20 @@ const VegetablesPage = () => {
                       max="10000"
                       step="1"
                       value={updatedPrices[item._id] || item.price}
-                      onChange={(e) => setUpdatedPrices((prev) => ({ ...prev, [item._id]: e.target.value }))} 
+                      onChange={(e) =>
+                        setUpdatedPrices((prev) => ({
+                          ...prev,
+                          [item._id]: e.target.value,
+                        }))
+                      }
                       placeholder="Update Price"
                       className="flex-1 p-2 border border-gray-300 rounded-l"
                     />
                     <button
-                      onClick={() => handleUpdatePrice(item._id, updatedPrices[item._id])}
- className="p-2 ml-2 bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-700 transition"
+                      onClick={() =>
+                        handleUpdatePrice(item._id, updatedPrices[item._id])
+                      }
+                      className="p-2 ml-2 bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-700 transition"
                     >
                       Update Price
                     </button>
@@ -275,7 +328,10 @@ const VegetablesPage = () => {
       </section>
 
       <div className="text-center my-8">
-        <Link to="/" className="inline-block bg-[#004526] text-white px-8 py-4 rounded-full hover:bg-green-600 transition-all">
+        <Link
+          to="/"
+          className="inline-block bg-[#004526] text-white px-8 py-4 rounded-full hover:bg-green-600 transition-all"
+        >
           Back to Home
         </Link>
       </div>
