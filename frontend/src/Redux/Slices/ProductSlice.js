@@ -65,6 +65,29 @@ export const updateProductPrice = createAsyncThunk('/admin/updatePrice', async (
     }
 });
 
+// 🔹 Deduct Stock After Purchase
+export const updateStockAfterPurchase = createAsyncThunk(
+  "/product/updateStock",
+  async (items) => {
+    try {
+        
+      let res = await toast.promise(
+        axiosInstance.patch("/product/update-stock", { items }),
+        {
+          loading: "Updating stock...",
+          success: "Stock updated successfully!",
+          error: "Failed to update stock!",
+        }
+      );
+      return res.data;
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Stock update failed!");
+      throw error;
+    }
+  }
+);
+
+
 // 🔹 Product Slice
 const productSlice = createSlice({
     name: "product",
@@ -77,46 +100,66 @@ const productSlice = createSlice({
     reducers: {},
     extraReducers: (builder) => {
         builder
-            .addCase(createItem.pending, (state) => {
-                state.loading = true;
-                state.error = null;
-                state.successMessage = null;
-            })
-            .addCase(createItem.fulfilled, (state, action) => {
-                state.loading = false;
-                state.successMessage = action.payload.message;
-            })
-            .addCase(createItem.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.error.message;
-            })
-            .addCase(getAllItems.pending, (state) => {
-                state.loading = true;
-                state.error = null;
-            })
-            .addCase(getAllItems.fulfilled, (state, action) => {
-                state.loading = false;
-                state.items = action.payload.items;
-            })
-            .addCase(getAllItems.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.error.message;
-            })
-            // 🔹 Handle Quantity Update
-            .addCase(updateProductQuantity.pending, (state) => {
-                state.loading = true;
-            })
-            .addCase(updateProductQuantity.fulfilled, (state, action) => {
-                state.loading = false;
-                const index = state.items.findIndex(item => item.id === action.payload.id);
-                if (index !== -1) {
-                    state.items[index].quantity = action.payload.quantity;
-                }
-            })
-            .addCase(updateProductQuantity.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.error.message;
+          .addCase(createItem.pending, (state) => {
+            state.loading = true;
+            state.error = null;
+            state.successMessage = null;
+          })
+          .addCase(createItem.fulfilled, (state, action) => {
+            state.loading = false;
+            state.successMessage = action.payload.message;
+          })
+          .addCase(createItem.rejected, (state, action) => {
+            state.loading = false;
+            state.error = action.error.message;
+          })
+          .addCase(getAllItems.pending, (state) => {
+            state.loading = true;
+            state.error = null;
+          })
+          .addCase(getAllItems.fulfilled, (state, action) => {
+            state.loading = false;
+            state.items = action.payload.items;
+          })
+          .addCase(getAllItems.rejected, (state, action) => {
+            state.loading = false;
+            state.error = action.error.message;
+          })
+          // 🔹 Handle Quantity Update
+          .addCase(updateProductQuantity.pending, (state) => {
+            state.loading = true;
+          })
+          .addCase(updateProductQuantity.fulfilled, (state, action) => {
+            state.loading = false;
+            const index = state.items.findIndex(
+              (item) => item.id === action.payload.id
+            );
+            if (index !== -1) {
+              state.items[index].quantity = action.payload.quantity;
+            }
+          })
+          .addCase(updateProductQuantity.rejected, (state, action) => {
+            state.loading = false;
+            state.error = action.error.message;
+          })
+          .addCase(updateStockAfterPurchase.pending, (state) => {
+            state.loading = true;
+          })
+          .addCase(updateStockAfterPurchase.fulfilled, (state, action) => {
+            state.loading = false;
+            action.payload.updatedItems.forEach((updatedItem) => {
+              const index = state.items.findIndex(
+                (item) => item.id === updatedItem.id
+              );
+              if (index !== -1) {
+                state.items[index].quantity = updatedItem.newQuantity;
+              }
             });
+          })
+          .addCase(updateStockAfterPurchase.rejected, (state, action) => {
+            state.loading = false;
+            state.error = action.error.message;
+          });
     }
 });
 

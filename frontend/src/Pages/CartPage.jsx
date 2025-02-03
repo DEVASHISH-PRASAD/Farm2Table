@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { removeItem, updateItemQuantity, clearCart, createOrder, verifyPayment } from "../Redux/Slices/CartSlice";
 import toast from "react-hot-toast";
+import { updateStockAfterPurchase } from "../Redux/Slices/ProductSlice";
 
 const CartPage = () => {
   const { items: cartItems, loading, error, paymentLoading, paymentError } = useSelector((state) => state.cart);
@@ -15,12 +16,6 @@ const CartPage = () => {
     
     const script = document.createElement("script");
     script.src = "https://checkout.razorpay.com/v1/checkout.js";
-    script.onload = () => {
-      console.log("Razorpay script loaded successfully");
-    };
-    script.onerror = (err) => {
-      console.error("Failed to load Razorpay script", err);
-    };
     document.body.appendChild(script);
 
     return () => {
@@ -71,31 +66,38 @@ const CartPage = () => {
         description: "Test Transaction",
         order_id: orderId,
         handler: function (response) {
-          const { razorpay_payment_id, razorpay_order_id, razorpay_signature } = response;
+          const { razorpay_payment_id, razorpay_order_id, razorpay_signature } =
+            response;
 
-          if (!razorpay_payment_id || !razorpay_order_id || !razorpay_signature) {
+          if (
+            !razorpay_payment_id ||
+            !razorpay_order_id ||
+            !razorpay_signature
+          ) {
             toast.error("Missing payment details in the response.");
             return;
           }
 
-          dispatch(verifyPayment({
-            paymentId: razorpay_payment_id,
-            orderId: razorpay_order_id,
-            signature: razorpay_signature,
-          }))
-            .then((response) => {
+          dispatch(
+            verifyPayment({
+              paymentId: razorpay_payment_id,
+              orderId: razorpay_order_id,
+              signature: razorpay_signature,
+            })
+          )
+            .then(async (response) => {
               if (response.payload.success) {
                 toast.success("Payment Verified!");
+                await dispatch(updateStockAfterPurchase(cartItems));
                 dispatch(clearCart());
                 navigate("/");
               } else {
                 toast.error("Payment verification failed. Please try again.");
-                console.error("Payment verification failed:", response.payload);
               }
             })
             .catch((error) => {
-              toast.error("Something went wrong while verifying the payment.");
-              console.error("Error during payment verification:", error);
+              toast.error("Error verifying payment.");
+
             });
         },
         prefill: {

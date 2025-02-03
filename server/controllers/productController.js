@@ -185,3 +185,37 @@ export const updateProductPrice = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
+
+export const updateStockAfterPurchase = async (req, res) => {
+  try {
+    const { items } = req.body;
+
+    for (const item of items) {
+      const product = await Item.findOne({ name: item.name });
+
+      if (!product) {
+        return res
+          .status(404)
+          .json({ success: false, message: `Product ${item.name} not found` });
+      }
+
+      if (product.quantity < item.weight) {
+        return res.status(400).json({
+          success: false,
+          message: `Insufficient stock for ${item.name}`,
+        });
+      }
+
+      product.quantity -= item.weight;
+      await product.save();
+    }
+
+    res
+      .status(200)
+      .json({ success: true, message: "Stock updated successfully!" });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ success: false, message: "Stock update failed", error });
+  }
+};

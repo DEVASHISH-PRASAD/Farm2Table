@@ -1,9 +1,9 @@
 import { Router } from "express";
-import { getAllItems } from "../controllers/productController.js";
+import { getAllItems, updateStockAfterPurchase } from "../controllers/productController.js";
 
 const router =Router();
 
 router.get('/',getAllItems);
-
+router.patch("/update-stock", updateStockAfterPurchase);
 
 export default router;

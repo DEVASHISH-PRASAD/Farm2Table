@@ -44,7 +44,6 @@ const createOrder = async (req, res) => {
       currency: razorpayOrder.currency,
     });
   } catch (error) {
-    console.error("❌ Error creating order:", error);
     res.status(500).json({ error: 'Failed to create order, please try again.' });
   }
 };
@@ -67,7 +66,6 @@ const verifyPayment = async (req, res) => {
 
     // Compare the generated signature with the received one
     if (generatedSignature !== signature) {
-      console.error("❌ Invalid Payment Signature!");
       return res.status(400).json({ error: "Invalid payment signature" });
     }
 
@@ -75,7 +73,6 @@ const verifyPayment = async (req, res) => {
     const order = await Order.findOne({ orderId });
 
     if (!order) {
-      console.error("❌ Order not found:", orderId);
       return res.status(404).json({ error: "Order not found" });
     }
 
@@ -87,7 +84,6 @@ const verifyPayment = async (req, res) => {
     res.status(200).json({ success: true, message: "Payment verified successfully" });
 
   } catch (error) {
-    console.error("❌ Payment verification failed:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
@@ -102,14 +98,12 @@ const getUserOrders = async (req, res) => {
     const orders = await Order.find({ user: userId })
       .sort({ createdAt: -1 })
       .lean(); // Use .lean() for better performance
-
-    // ✅ Always return an array
     res.status(200).json(orders);
   } catch (error) {
-    console.error("❌ Error fetching user orders:", error.message);
     res.status(500).json({ error: "Failed to fetch orders" });
   }
 };
+
 
 // Export functions
 export { createOrder, verifyPayment, getUserOrders };

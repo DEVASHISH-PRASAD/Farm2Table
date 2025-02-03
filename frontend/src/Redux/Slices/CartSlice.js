@@ -40,8 +40,6 @@ export const getPreviousOrders = createAsyncThunk(
       const response = await axios.get(`/orders/previous/${id}`);
       return response.data;
     } catch (error) {
-      console.error(" Error fetching previous orders:", error.message);
-      
       return rejectWithValue(
         error.response?.data || error.message || "Failed to fetch orders"
       );
@@ -67,15 +65,11 @@ const CartSlice = createSlice({
       } else {
         state.items = [...state.items, action.payload];
       }
-      // Log the updated state for debugging purposes
-      console.log("Updated cart (addItem):", state.items);
-      localStorage.setItem("cartItems", JSON.stringify(state.items));  // Update localStorage after state change
+      localStorage.setItem("cartItems", JSON.stringify(state.items));  
     },
     removeItem: (state, action) => {
       // Immutably update the items array
       state.items = state.items.filter((item) => item.name !== action.payload);
-      // Log the updated state for debugging purposes
-      console.log("Updated cart (removeItem):", state.items);
       localStorage.setItem("cartItems", JSON.stringify(state.items));  // Update localStorage
     },
     updateItemQuantity: (state, action) => {
@@ -84,15 +78,11 @@ const CartSlice = createSlice({
         item.name === name ? { ...item, weight } : item
       );
       state.items = updatedItems;
-      // Log the updated state for debugging purposes
-      console.log("Updated cart (updateItemQuantity):", state.items);
       localStorage.setItem("cartItems", JSON.stringify(state.items));  // Update localStorage
     },
     clearCart: (state) => {
       state.items = [];
       localStorage.removeItem("cartItems"); // Clear cart in localStorage
-      // Log the action for debugging purposes
-      console.log("Cart cleared");
     },
   },
   extraReducers: (builder) => {
@@ -129,7 +119,6 @@ const CartSlice = createSlice({
         state.error = null;
       })
       .addCase(getPreviousOrders.fulfilled, (state, action) => {
-        console.log("Redux received orders:", action.payload);
         state.loading = false;
         
         // Ensure `previousOrders` is always an array
