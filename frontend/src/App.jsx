@@ -21,6 +21,7 @@ import RequestResetPasswordPage from "./Pages/User/RequestResetPasswordPage";
 import ResetPasswordPage from "./Pages/User/ResetPasswordPage"
 import PreviousOrder from "./Pages/Cart/PreviousOrder";
 import AnalyticsPage from "./Pages/Admin/AnalyticsPage";
+import Page404 from "./Pages/Page404";
 
 function App() {
   return (
