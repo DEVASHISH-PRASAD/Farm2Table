@@ -70,15 +70,7 @@ export const updateStockAfterPurchase = createAsyncThunk(
   "/product/updateStock",
   async (items) => {
     try {
-        
-      let res = await toast.promise(
-        axiosInstance.patch("/product/update-stock", { items }),
-        {
-          loading: "Updating stock...",
-          success: "Stock updated successfully!",
-          error: "Failed to update stock!",
-        }
-      );
+      let res = await axiosInstance.patch("/product/update-stock", { items });
       return res.data;
     } catch (error) {
       toast.error(error?.response?.data?.message || "Stock update failed!");
@@ -147,6 +139,13 @@ const productSlice = createSlice({
           })
           .addCase(updateStockAfterPurchase.fulfilled, (state, action) => {
             state.loading = false;
+            if (
+              !action.payload ||
+              !Array.isArray(action.payload.updatedItems)
+            ) {
+              state.error = "Invalid response format from server";
+              return;
+            }
             action.payload.updatedItems.forEach((updatedItem) => {
               const index = state.items.findIndex(
                 (item) => item.id === updatedItem.id
@@ -156,6 +155,7 @@ const productSlice = createSlice({
               }
             });
           })
+
           .addCase(updateStockAfterPurchase.rejected, (state, action) => {
             state.loading = false;
             state.error = action.error.message;

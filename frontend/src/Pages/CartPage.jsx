@@ -96,6 +96,7 @@ const CartPage = () => {
               }
             })
             .catch((error) => {
+              console.log(error);
               toast.error("Error verifying payment.");
 
             });

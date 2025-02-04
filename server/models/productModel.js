@@ -1,10 +1,10 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 const itemSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
-    unique: true, // Prevent duplicates
+    unique: true, 
     trim: true,
   },
   img: {
@@ -16,12 +16,12 @@ const itemSchema = new mongoose.Schema({
     },
   },
   price: {
-    type: String, // String type to handle currency symbol
+    type: String, 
     required: true,
   },
   category: {
     type: String,
-    enum: ['fruits', 'grains', 'vegetables'],
+    enum: ["fruits", "grains", "vegetables"],
     required: true,
   },
   quantity: {
@@ -45,8 +45,13 @@ const itemSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  // field for tracking sales per month
+  monthlySales: {
+    type: Number,
+    default: 0,
+  },
 });
 
-const Item = mongoose.model('Item', itemSchema);
+const Item = mongoose.model("Item", itemSchema);
 
 export default Item;

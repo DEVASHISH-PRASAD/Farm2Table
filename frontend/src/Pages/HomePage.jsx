@@ -3,7 +3,7 @@ import AOS from "aos";
 import { IoCartOutline } from "react-icons/io5";
 import img from "../assets/bgImage.jpg";
 import veg from "../assets/veg.jpeg";
-import dairy from "../assets/dairy.jpeg";
+import grains from "../assets/grains.png";
 import fruits from "../assets/fruits.jpeg";
 import farm from "../assets/logo.png";
 import farm2 from "../assets/farm2.jpeg";
@@ -331,8 +331,8 @@ const HomePage = () => {
           <div className="card bg-white shadow-lg" data-aos="flip-left">
             <figure>
               <img
-                src={dairy}
-                alt="Dairy Products"
+                src={grains}
+                alt="Grains"
                 className="w-full h-32 md:h-48 object-cover hover:scale-125 transition-all ease-in-out duration-300"
               />
             </figure>

@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 const orderSchema = new mongoose.Schema(
   {
@@ -9,7 +9,7 @@ const orderSchema = new mongoose.Schema(
     },
     user: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
+      ref: "User",
       required: true,
     },
     items: [
@@ -34,8 +34,8 @@ const orderSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ['Pending', 'Paid', 'Failed', 'Cancelled', 'Refunded'],
-      default: 'Pending',
+      enum: ["Pending", "Paid", "Failed", "Cancelled", "Refunded"],
+      default: "Pending",
     },
     paymentId: {
       type: String,
@@ -47,8 +47,8 @@ const orderSchema = new mongoose.Schema(
     },
     refundStatus: {
       type: String,
-      enum: ['Not Requested', 'Requested', 'Refunded'],
-      default: 'Not Requested',
+      enum: ["Not Requested", "Requested", "Refunded"],
+      default: "Not Requested",
     },
     cancelled: {
       type: Boolean,
@@ -58,23 +58,42 @@ const orderSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    deliveryStatus: {  // New field added for delivery status
+    deliveryStatus: {
+      //  field added for delivery status
       type: String,
-      enum: ['Not Dispatched', 'Shipped', 'In Transit', 'Out for Delivery', 'Delivered'],
-      default: 'Not Dispatched',
+      enum: [
+        "Not Dispatched",
+        "Shipped",
+        "In Transit",
+        "Out for Delivery",
+        "Delivered",
+      ],
+      default: "Not Dispatched",
     },
-    paymentMethod: {  // New field added for payment method
+    paymentMethod: {
+      // New field added for payment method
       type: String,
-      enum: ['Credit Card', 'Debit Card', 'Net Banking', 'UPI', 'Cash on Delivery'],
-      default: 'Credit Card',
+      enum: [
+        "Credit Card",
+        "Debit Card",
+        "Net Banking",
+        "UPI",
+        "Cash on Delivery",
+      ],
+      default: "UPI",
       required: true,
+    },
+    // field for tracking order creation date for analytics
+    createdAt: {
+      type: Date,
+      default: Date.now,
     },
   },
   {
-    timestamps: true, 
+    timestamps: true,
   }
 );
 
-const Order = mongoose.model('Order', orderSchema);
+const Order = mongoose.model("Order", orderSchema);
 
 export default Order;

@@ -116,7 +116,6 @@ const GrainsPage = () => {
     const confirmUpdate = window.confirm("Are you sure you want to update the quantity?");
     if (confirmUpdate) {
       dispatch(updateProductQuantity({ id: productId, quantity })).then(() => {
-        toast.success("Product quantity updated successfully!");
         setUpdatedQuantities((prev) => ({
           ...prev,
           [productId]: quantity,
@@ -136,7 +135,6 @@ const GrainsPage = () => {
     const confirmUpdate = window.confirm("Are you sure you want to update the price?");
     if (confirmUpdate) {
       dispatch(updateProductPrice({ id: productId, price })).then(() => {
-        toast.success("Product price updated successfully!");
         setUpdatedPrices((prev) => ({
           ...prev,
           [productId]: price,

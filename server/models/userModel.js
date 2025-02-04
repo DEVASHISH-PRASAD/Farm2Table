@@ -44,6 +44,16 @@ const userSchema = new Schema(
       type: Boolean,
       default: false,
     },
+    // field for tracking total amount spent by user per month
+    monthlySpend: {
+      type: Number,
+      default: 0,
+    },
+    // field for tracking total orders made by the user
+    totalOrders: {
+      type: Number,
+      default: 0,
+    },
   },
   { timestamps: true }
 );
@@ -82,7 +92,7 @@ userSchema.methods = {
       .update(resetToken)
       .digest("hex");
     this.forgotPasswordExpiry = Date.now() + 15 * 60 * 1000; // 15 minutes
-    this.forgotPasswordUsed = false; 
+    this.forgotPasswordUsed = false;
     return resetToken;
   },
 };

@@ -20,6 +20,7 @@ import AdminUserManagement from "./Pages/Admin/AdminUserManagement";
 import RequestResetPasswordPage from "./Pages/User/RequestResetPasswordPage";
 import ResetPasswordPage from "./Pages/User/ResetPasswordPage"
 import PreviousOrder from "./Pages/Cart/PreviousOrder";
+import AnalyticsPage from "./Pages/Admin/AnalyticsPage";
 
 function App() {
   useEffect(() => {
@@ -39,7 +40,7 @@ function App() {
             <RequireAuth allowedRoles={["ADMIN", "CUSTOMER", "FARMER"]} />
           }
         >
-          <Route path="/dashboard" element={<Dashboard/>}></Route>
+          <Route path="/dashboard" element={<Dashboard />}></Route>
           <Route path="/cart" element={<CartPage />}></Route>
           <Route path="/previous-order" element={<PreviousOrder />}></Route>
         </Route>
@@ -50,9 +51,11 @@ function App() {
 
         <Route path="/signup" element={<Signup />}></Route>
         <Route path="/login" element={<LoginPage />}></Route>
-        <Route path="/forgotPassword" element={<RequestResetPasswordPage />}></Route>
+        <Route
+          path="/forgotPassword"
+          element={<RequestResetPasswordPage />}
+        ></Route>
         <Route path="/reset-password" element={<ResetPasswordPage />}></Route>
-
 
         <Route path="/vegetable" element={<VegetablesPage />}></Route>
         <Route path="/fruits" element={<FruitsPage />}></Route>
@@ -60,12 +63,14 @@ function App() {
 
         <Route path="/denied" element={<AccessDenied />}></Route>
 
-          
         <Route element={<RequireAuth allowedRoles={["ADMIN"]} />}>
           <Route path="/createItem" element={<CreateItem />}></Route>
-          <Route path="/adminUserManagement" element={<AdminUserManagement/>}></Route>
+          <Route path="/analytics" element={<AnalyticsPage />} />
+          <Route
+            path="/adminUserManagement"
+            element={<AdminUserManagement />}
+          ></Route>
         </Route>
-        
       </Routes>
     </>
   );
