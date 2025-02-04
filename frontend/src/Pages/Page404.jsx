@@ -1,6 +1,5 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 
 const Page404 = () => {
@@ -55,12 +54,12 @@ const Page404 = () => {
           Oops! The page you're looking for doesn't exist.
         </motion.p>
         <motion.div {...bounceAnimation}>
-          <Button
+          <button
             className="bg-white text-purple-600 px-6 py-3 rounded-2xl shadow-xl hover:bg-purple-600 hover:text-white transition duration-300"
             onClick={() => navigate("/")}
           >
             Go Home
-          </Button>
+          </button>
         </motion.div>
       </motion.div>
     </div>
