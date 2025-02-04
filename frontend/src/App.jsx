@@ -23,13 +23,6 @@ import PreviousOrder from "./Pages/Cart/PreviousOrder";
 import AnalyticsPage from "./Pages/Admin/AnalyticsPage";
 
 function App() {
-  useEffect(() => {
-    // Force the light mode by removing any dark class
-    document.body.classList.remove("dark");
-
-    // Optionally, you can add a class to the body for light mode explicitly
-    document.body.classList.add("light");
-  }, []);
   return (
     <>
       <Routes>
@@ -71,6 +64,8 @@ function App() {
             element={<AdminUserManagement />}
           ></Route>
         </Route>
+
+        <Route path="*" element={<Page404 />} />
       </Routes>
     </>
   );
