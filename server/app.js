@@ -34,7 +34,7 @@ app.use("/api/v1/user", userRoutes);
 app.use("/api/v1/product", productRoutes);
 app.use("/api/v1",miscRoute)
 app.use('/api/v1/orders',orderRoutes)
-app.use("/api/v1/analytics", analyticsRoutes);
+app.use("/api/v1/analytics",isLoggedIn,authorizeRoles("ADMIN"), analyticsRoutes);
 app.use("/api/v1/admin",isLoggedIn,authorizeRoles("ADMIN"),adminRoutes);
 
 
