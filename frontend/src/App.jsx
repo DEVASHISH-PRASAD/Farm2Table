@@ -80,14 +80,14 @@ function App() {
         {/* Farmer Routes */}
         <Route element={<RequireAuth allowedRoles={["FARMER"]} />}>
           <Route path="/farmer/add-product" element={<AddProduct />} />
-          <Route path="/farmer/product/stock" element={<UpdateStock />} />
-          <Route
-            path="/farmer/product/:productId"
-            element={<DeleteProduct />}
-          />
+          <Route path="/farmer/update-stock" element={<UpdateStock />} />
+          <Route path="/farmer/delete-product" element={<DeleteProduct />} />
           <Route path="/farmer/products" element={<ViewProducts />} />
-          <Route path="/farmer/orders" element={<ViewOrdersReceived />} />
-          <Route path="/farmer/profile" element={<UpdateProfileFarmer />} />
+          <Route
+            path="/farmer/orders-received"
+            element={<ViewOrdersReceived />}
+          />
+          <Route path="/farmer/update-profile" element={<UpdateProfileFarmer />} />
         </Route>
 
         {/* Wholesaler Routes */}
