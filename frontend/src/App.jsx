@@ -30,10 +30,10 @@ import ViewProducts from "./components/Farmer/ViewProducts";
 import ViewOrdersReceived from "./components/Farmer/ViewOrdersReceived";
 import UpdateProfileFarmer from "./components/Farmer/UpdateProfileFarmer";
 // Wholesaler Pages
-import PurchaseProduct from "./components/Wholesaler/PurchaseProduct";
-import ViewOrderHistory from "./components/Wholesaler/ViewOrderHistory";
-import ViewAvailableProducts from "./components/Wholesaler/ViewAvailableProducts";
-import UpdateProfileWholesaler from "./components/Wholesaler/UpdateProfileWholesaler";
+import PurchaseProduct from "./components/wholesaler/PurchaseProduct";
+import ViewOrderHistory from "./components/wholesaler/ViewOrderHistory";
+import ViewAvailableProducts from "./components/wholesaler/ViewAvailableProducts";
+import UpdateProfileWholesaler from "./components/wholesaler/UpdateProfileWholesaler";
 
 function App() {
   return (
