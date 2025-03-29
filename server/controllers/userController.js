@@ -15,19 +15,55 @@ const cookieOption = {
  * USER REGISTRATION MODULE
  */
 export const register = async (req, res, next) => {
-  const { fullname, email, phone, password, role } = req.body;
+  const {
+    fullname,
+    email,
+    phone,
+    password,
+    role,
+    businessName,
+    gstNumber,
+    latitude,
+    longitude,
+    crops,
+  } = req.body;
   console.log("REQUEST::", req.body);
 
   if (!fullname || !email || !phone || !password) {
     return next(new AppError("All fields are mandatory!!", 400));
   }
 
+  if (role === "WHOLESALER" && (!businessName || !gstNumber)) {
+    return next(
+      new AppError(
+        "Business name and GST number are required for wholesalers!!",
+        400
+      )
+    );
+  }
+
+  if (
+    role === "FARMER" &&
+    (latitude === undefined ||
+      longitude === undefined ||
+      !crops ||
+      !crops.length)
+  ) {
+    return next(
+      new AppError(
+        "Latitude, longitude, and at least one crop are required for farmers!!",
+        400
+      )
+    );
+  }
+
   const userExist = await User.findOne({ email });
   if (userExist) {
     return res.status(400).json({
-      message:"User already exists!"
-    })
+      message: "User already exists!",
+    });
   }
+
   const user = await User.create({
     fullname,
     email,
@@ -39,7 +75,12 @@ export const register = async (req, res, next) => {
       secure_url:
         "https://res.cloudinary.com/du9jzqlpt/image/upload/v1674647316/avatar_drzgxv.jpg",
     },
+    businessName: role === "WHOLESALER" ? businessName : undefined,
+    gstNumber: role === "WHOLESALER" ? gstNumber : undefined,
+    location: role === "FARMER" ? { latitude, longitude } : undefined,
+    crops: role === "FARMER" ? crops : undefined,
   });
+
   if (!user) {
     return next(
       new AppError("User registration failed, please try again!!", 400)
@@ -63,10 +104,11 @@ export const register = async (req, res, next) => {
       }
     } catch (err) {
       return next(
-        new AppError(err || "file not uploaded ,please try again!", 500)
+        new AppError(err || "File not uploaded, please try again!", 500)
       );
     }
   }
+
   await user.save();
   user.password = undefined;
 
@@ -80,6 +122,7 @@ export const register = async (req, res, next) => {
     user,
   });
 };
+
 
 /**
  * USER LOGIN MODULE

@@ -15,13 +15,56 @@ const Dashboard = () => {
   function handleLogout() {
     dispatch(logout());
   }
-    useState(() => {
-      AOS.init({
-        duration: 1000,
-        once: false,
-        mirror: false,
-      });
+
+  useState(() => {
+    AOS.init({
+      duration: 1000,
+      once: false,
+      mirror: false,
     });
+  });
+
+  // Farmer-specific actions (placeholders)
+  const handleAddProduct = () => {
+    navigate("/farmer/add-product"); // Example route
+  };
+
+  const handleUpdateStock = () => {
+    navigate("/farmer/update-stock"); // Example route
+  };
+
+  const handleDeleteProduct = () => {
+    navigate("/farmer/delete-product"); // Example route
+  };
+
+  const handleViewFarmerProducts = () => {
+    navigate("/farmer/products"); // Example route
+  };
+
+  const handleViewOrdersReceived = () => {
+    navigate("/farmer/orders-received"); // Example route
+  };
+
+  const handleUpdateProfileFarmer = () => {
+    navigate("/farmer/update-profile"); // Example route
+  };
+
+  // Wholesaler-specific actions (placeholders)
+  const handlePurchaseProduct = () => {
+    navigate("/wholesaler/purchase-product"); // Example route
+  };
+
+  const handleViewOrderHistory = () => {
+    navigate("/wholesaler/order-history"); // Example route
+  };
+
+  const handleViewAvailableProducts = () => {
+    navigate("/wholesaler/available-products"); // Example route
+  };
+
+  const handleUpdateProfileWholesaler = () => {
+    navigate("/wholesaler/update-profile"); // Example route
+  };
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
@@ -63,6 +106,7 @@ const Dashboard = () => {
 
         {/* Grid container for buttons */}
         <div className="grid grid-cols-2 gap-4 w-full mt-6">
+          {/* Common button for all roles */}
           {userData.role && (
             <button
               onClick={() => navigate("/previous-order")}
@@ -71,6 +115,80 @@ const Dashboard = () => {
               Previous Orders
             </button>
           )}
+
+          {/* Farmer-specific buttons */}
+          {userData.role === "FARMER" && (
+            <>
+              <button
+                onClick={handleAddProduct}
+                className="px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+              >
+                Add Product
+              </button>
+              <button
+                onClick={handleUpdateStock}
+                className="px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+              >
+                Update Stock
+              </button>
+              <button
+                onClick={handleDeleteProduct}
+                className="px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+              >
+                Delete Product
+              </button>
+              <button
+                onClick={handleViewFarmerProducts}
+                className="px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+              >
+                View Products
+              </button>
+              <button
+                onClick={handleViewOrdersReceived}
+                className="px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+              >
+                View Orders Received
+              </button>
+              <button
+                onClick={handleUpdateProfileFarmer}
+                className="px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+              >
+                Update Profile
+              </button>
+            </>
+          )}
+
+          {/* Wholesaler-specific buttons */}
+          {userData.role === "WHOLESALER" && (
+            <>
+              <button
+                onClick={handlePurchaseProduct}
+                className="px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+              >
+                Purchase Product
+              </button>
+              <button
+                onClick={handleViewOrderHistory}
+                className="px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+              >
+                View Order History
+              </button>
+              <button
+                onClick={handleViewAvailableProducts}
+                className="px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+              >
+                View Available Products
+              </button>
+              <button
+                onClick={handleUpdateProfileWholesaler}
+                className="px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+              >
+                Update Profile
+              </button>
+            </>
+          )}
+
+          {/* Admin-specific buttons (existing) */}
           {userData.role === "ADMIN" && (
             <>
               <button

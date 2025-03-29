@@ -26,30 +26,49 @@ const userSchema = new Schema(
       minLength: [8, "Password must be at least 8 characters!!"],
     },
     phone: {
-      type: String, // Changed from Number to String
+      type: String,
       required: [true, "Phone number is required!"],
     },
     role: {
       type: String,
-      enum: ["FARMER", "CUSTOMER", "ADMIN"],
+      enum: ["FARMER", "CUSTOMER", "WHOLESALER", "ADMIN"],
       default: "CUSTOMER",
     },
     avatar: {
       public_id: String,
       secure_url: String,
     },
+    location: {
+      latitude: { type: Number, required: false },
+      longitude: { type: Number, required: false },
+    },
+    businessName: {
+      type: String,
+      required: function () {
+        return this.role === "WHOLESALER";
+      },
+    },
+    gstNumber: {
+      type: String,
+      required: function () {
+        return this.role === "WHOLESALER";
+      },
+    },
+    crops: [
+      {
+        type: String,
+      },
+    ],
     forgotPasswordToken: String,
     forgotPasswordExpiry: Date,
     forgotPasswordUsed: {
       type: Boolean,
       default: false,
     },
-    // field for tracking total amount spent by user per month
     monthlySpend: {
       type: Number,
       default: 0,
     },
-    // field for tracking total orders made by the user
     totalOrders: {
       type: Number,
       default: 0,
@@ -58,7 +77,6 @@ const userSchema = new Schema(
   { timestamps: true }
 );
 
-// Prevent double hashing of password
 userSchema.pre("save", async function (next) {
   if (this.isModified("password") && !this.password.startsWith("$2a$")) {
     try {
@@ -70,7 +88,6 @@ userSchema.pre("save", async function (next) {
   next();
 });
 
-// User Methods
 userSchema.methods = {
   generateJWTToken: function () {
     return JWT.sign(
@@ -79,19 +96,16 @@ userSchema.methods = {
       { expiresIn: process.env.JWT_EXPIRY }
     );
   },
-
   comparePassword: function (plainTextPassword) {
     return bcrypt.compare(plainTextPassword, this.password);
   },
-
   generatePasswordResetToken: function () {
     const resetToken = crypto.randomBytes(20).toString("hex");
-
     this.forgotPasswordToken = crypto
       .createHash("sha256")
       .update(resetToken)
       .digest("hex");
-    this.forgotPasswordExpiry = Date.now() + 15 * 60 * 1000; // 15 minutes
+    this.forgotPasswordExpiry = Date.now() + 15 * 60 * 1000;
     this.forgotPasswordUsed = false;
     return resetToken;
   },

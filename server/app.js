@@ -10,6 +10,8 @@ import miscRoute from "./routes/miscRoutes.js"
 import orderRoutes from "./routes/orderRoutes.js"
 import adminRoutes from "./routes/adminRoutes.js"
 import analyticsRoutes from "./routes/analyticsRoutes.js"
+import farmerRoutes from "./routes/farmerRoutes.js"
+import wholesalerRoutes from "./routes/wholesalerRoutes.js"
 import { isLoggedIn, authorizeRoles } from "./middlewares/authMiddleware.js";
 
 
@@ -36,7 +38,8 @@ app.use("/api/v1",miscRoute)
 app.use('/api/v1/orders',orderRoutes)
 app.use("/api/v1/analytics",isLoggedIn,authorizeRoles("ADMIN"), analyticsRoutes);
 app.use("/api/v1/admin",isLoggedIn,authorizeRoles("ADMIN"),adminRoutes);
-
+app.use("/api/v1/farmer",farmerRoutes);
+app.use("/api/v1/wholesaler", wholesalerRoutes);
 
 app.get("*", (req, res) => {
   res.status(404).json({

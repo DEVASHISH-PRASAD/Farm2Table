@@ -32,9 +32,12 @@ const SignupForm = () => {
     confirmPassword: "",
     role: "CUSTOMER",
     avatar: "",
+    businessName: "",
+    gstNumber: "",
+    latitude: "",
+    longitude: "",
+    crops: [],
   });
-
-  
 
   const [emailVerified, setEmailVerified] = useState(false);
 
@@ -52,6 +55,32 @@ const SignupForm = () => {
       fileReader.onload = () => {
         setProfileImage(fileReader.result);
       };
+    }
+  };
+
+  const handleCropsChange = (e) => {
+    const selectedOptions = Array.from(e.target.selectedOptions, option => option.value);
+    setFormData({ ...formData, crops: selectedOptions });
+  };
+
+  const getCurrentLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          setFormData({
+            ...formData,
+            latitude: latitude.toString(),
+            longitude: longitude.toString(),
+          });
+          toast.success("Location fetched successfully!");
+        },
+        (error) => {
+          toast.error("Failed to fetch location: " + error.message);
+        }
+      );
+    } else {
+      toast.error("Geolocation is not supported by your browser.");
     }
   };
 
@@ -84,7 +113,13 @@ const SignupForm = () => {
     }
 
     const formDataToSend = new FormData();
-    Object.keys(formData).forEach((key) => formDataToSend.append(key, formData[key]));
+    Object.keys(formData).forEach((key) => {
+      if (key === "crops") {
+        formData[key].forEach(crop => formDataToSend.append("crops[]", crop));
+      } else {
+        formDataToSend.append(key, formData[key]);
+      }
+    });
 
     try {
       const response = await dispatch(createAccount(formDataToSend)).unwrap();
@@ -100,6 +135,11 @@ const SignupForm = () => {
         confirmPassword: "",
         role: "CUSTOMER",
         avatar: "",
+        businessName: "",
+        gstNumber: "",
+        latitude: "",
+        longitude: "",
+        crops: [],
       });
       setProfileImage("");
     } catch (error) {
@@ -130,8 +170,13 @@ const SignupForm = () => {
       setFormData({
         fullname: "",
         email: "",
-        password: "", // Clear the password field after successful creation
+        password: "",
         avatar: "",
+        businessName: "",
+        gstNumber: "",
+        latitude: "",
+        longitude: "",
+        crops: [],
       });
       setProfileImage("");
     } catch (error) {
@@ -146,6 +191,21 @@ const SignupForm = () => {
       mirror: false,
     });
   });
+
+  // Predefined list of crops (you can expand this as needed)
+  const cropOptions = [
+    "Wheat",
+    "Rice",
+    "Corn",
+    "Barley",
+    "Soybean",
+    "Potato",
+    "Tomato",
+    "Cotton",
+    "Sugarcane",
+    "Apple",
+  ];
+
   return (
     <div className="min-h-screen flex flex-col bg-gray-100">
       <Header />
@@ -210,15 +270,82 @@ const SignupForm = () => {
               <label className="label font-medium text-gray-700">Confirm Password</label>
               <input type="password" name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} className="input input-bordered w-full px-4 py-2" required />
             </div>
-
+                <div className="form-control mb-4">
+                  <label className="label font-medium text-gray-700">Location</label>
+                  <button
+                    type="button"
+                    onClick={getCurrentLocation}
+                    className="bg-[#004526] text-white py-2 px-4 rounded-lg hover:bg-teal-700"
+                  >
+                    Get Current Location
+                  </button>
+                  {formData.latitude && formData.longitude && (
+                    <p className="mt-2 text-gray-600">
+                      Latitude: {formData.latitude}, Longitude: {formData.longitude}
+                    </p>
+                  )}
+                </div>
             {/* Role Selection */}
             <div>
               <label className="label font-medium text-gray-700">Select Type</label>
               <select name="role" value={formData.role} onChange={handleChange} className="input input-bordered w-full px-4 py-2">
                 <option value="CUSTOMER">CUSTOMER</option>
                 <option value="FARMER">FARMER</option>
+                <option value="WHOLESALER">WHOLESALER</option>
               </select>
             </div>
+
+            {/* Conditional Fields for FARMER */}
+            {formData.role === "FARMER" && (
+              <>
+                <div className="form-control mb-4">
+                  <label className="label font-medium text-gray-700">Crops (Select multiple)</label>
+                  <select
+                    name="crops"
+                    multiple
+                    value={formData.crops}
+                    onChange={handleCropsChange}
+                    className="input input-bordered w-full px-4 py-2 h-24"
+                    required
+                  >
+                    {cropOptions.map((crop) => (
+                      <option key={crop} value={crop}>
+                        {crop}
+                      </option>
+                    ))}
+                  </select>
+                  <p className="text-sm text-gray-500 mt-1">Hold Ctrl (or Cmd) to select multiple crops</p>
+                </div>
+              </>
+            )}
+
+            {/* Conditional Fields for WHOLESALER */}
+            {formData.role === "WHOLESALER" && (
+              <>
+                <div className="form-control mb-4">
+                  <label className="label font-medium text-gray-700">Business Name</label>
+                  <input
+                    type="text"
+                    name="businessName"
+                    value={formData.businessName}
+                    onChange={handleChange}
+                    className="input input-bordered w-full px-4 py-2"
+                    required
+                  />
+                </div>
+                <div className="form-control mb-4">
+                  <label className="label font-medium text-gray-700">GST Number</label>
+                  <input
+                    type="text"
+                    name="gstNumber"
+                    value={formData.gstNumber}
+                    onChange={handleChange}
+                    className="input input-bordered w-full px-4 py-2"
+                    required
+                  />
+                </div>
+              </>
+            )}
 
             <button type="submit" className="bg-[#004526] text-white py-3 px-6 rounded-lg text-lg hover:bg-teal-700 mt-6 w-full">Sign Up</button>
           </form>
@@ -240,7 +367,7 @@ const SignupForm = () => {
                 Sign Up
               </a>
             </p>
-            </div>
+          </div>
         </div>
       </div>
       <Footer />
