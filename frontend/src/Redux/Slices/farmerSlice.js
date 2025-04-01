@@ -2,8 +2,6 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "../../Helpers/axiosInstance";
 
 
-
-// Add a new product
 export const addProduct = createAsyncThunk(
   "farmer/addProduct",
   async (productData, { rejectWithValue }) => {
@@ -13,7 +11,7 @@ export const addProduct = createAsyncThunk(
         productData,
         { withCredentials: true }
       );
-      return response.data;
+      return response.data.data.product;
     } catch (error) {
       return rejectWithValue(
         error.response?.data?.message || "Error adding product"
@@ -22,7 +20,6 @@ export const addProduct = createAsyncThunk(
   }
 );
 
-// Update product stock
 export const updateStock = createAsyncThunk(
   "farmer/updateStock",
   async ({ productId, stock }, { rejectWithValue }) => {
@@ -32,7 +29,7 @@ export const updateStock = createAsyncThunk(
         { productId, stock },
         { withCredentials: true }
       );
-      return response.data;
+      return response.data.data.product;
     } catch (error) {
       return rejectWithValue(
         error.response?.data?.message || "Error updating stock"
@@ -41,16 +38,14 @@ export const updateStock = createAsyncThunk(
   }
 );
 
-// Delete a product
 export const deleteProduct = createAsyncThunk(
   "farmer/deleteProduct",
   async (productId, { rejectWithValue }) => {
     try {
-      const response = await axios.delete(
-        `/farmer/product/${productId}`,
-        { withCredentials: true }
-      );
-      return response.data;
+      await axios.delete(`/farmer/product/${productId}`, {
+        withCredentials: true,
+      });
+      return productId; // Return productId to remove from state if needed
     } catch (error) {
       return rejectWithValue(
         error.response?.data?.message || "Error deleting product"
@@ -59,7 +54,6 @@ export const deleteProduct = createAsyncThunk(
   }
 );
 
-// Get all products added by the farmer
 export const getFarmerProducts = createAsyncThunk(
   "farmer/getFarmerProducts",
   async (_, { rejectWithValue }) => {
@@ -67,7 +61,7 @@ export const getFarmerProducts = createAsyncThunk(
       const response = await axios.get(`/farmer/products`, {
         withCredentials: true,
       });
-      return response.data.products;
+      return response.data.data.products;
     } catch (error) {
       return rejectWithValue(
         error.response?.data?.message || "Error fetching products"
@@ -76,7 +70,6 @@ export const getFarmerProducts = createAsyncThunk(
   }
 );
 
-// Get orders placed for farmer's products
 export const getOrdersReceived = createAsyncThunk(
   "farmer/getOrdersReceived",
   async (_, { rejectWithValue }) => {
@@ -84,7 +77,7 @@ export const getOrdersReceived = createAsyncThunk(
       const response = await axios.get(`/farmer/orders`, {
         withCredentials: true,
       });
-      return response.data.orders;
+      return response.data.data.orders;
     } catch (error) {
       return rejectWithValue(
         error.response?.data?.message || "Error fetching orders"
@@ -93,7 +86,6 @@ export const getOrdersReceived = createAsyncThunk(
   }
 );
 
-// Update farmer profile
 export const updateProfileFarmer = createAsyncThunk(
   "farmer/updateProfile",
   async (profileData, { rejectWithValue }) => {
@@ -103,7 +95,7 @@ export const updateProfileFarmer = createAsyncThunk(
         profileData,
         { withCredentials: true }
       );
-      return response.data;
+      return response.data.data.farmer;
     } catch (error) {
       return rejectWithValue(
         error.response?.data?.message || "Error updating profile"
@@ -127,43 +119,45 @@ const farmerSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // Add Product
       .addCase(addProduct.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(addProduct.fulfilled, (state) => {
+      .addCase(addProduct.fulfilled, (state, action) => {
         state.loading = false;
+        state.products.push(action.payload);
       })
       .addCase(addProduct.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
-      // Update Stock
       .addCase(updateStock.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(updateStock.fulfilled, (state) => {
+      .addCase(updateStock.fulfilled, (state, action) => {
         state.loading = false;
+        const index = state.products.findIndex(
+          (p) => p._id === action.payload._id
+        );
+        if (index !== -1) state.products[index] = action.payload;
       })
       .addCase(updateStock.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
-      // Delete Product
       .addCase(deleteProduct.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(deleteProduct.fulfilled, (state) => {
+      .addCase(deleteProduct.fulfilled, (state, action) => {
         state.loading = false;
+        state.products = state.products.filter((p) => p._id !== action.payload);
       })
       .addCase(deleteProduct.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
-      // Get Farmer Products
       .addCase(getFarmerProducts.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -176,7 +170,6 @@ const farmerSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-      // Get Orders Received
       .addCase(getOrdersReceived.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -189,7 +182,6 @@ const farmerSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-      // Update Profile
       .addCase(updateProfileFarmer.pending, (state) => {
         state.loading = true;
         state.error = null;

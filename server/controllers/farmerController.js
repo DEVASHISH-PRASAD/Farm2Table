@@ -3,15 +3,10 @@ import Product from "../models/productModel.js";
 import Order from "../models/orderModel.js";
 import AppError from "../utils/errorUtil.js";
 
-/**
- * ADD PRODUCT
- */
-export const addProduct = async (req, res, next) => {
+export const     addProduct = async (req, res, next) => {
   try {
     const { name, price, stock, category, description } = req.body;
-    const farmer = await Farmer.findOne({ user: req.user.id });
-
-    if (!farmer) return next(new AppError("Farmer profile not found!", 404));
+    const farmerId = req.user.id;
 
     const product = await Product.create({
       name,
@@ -19,140 +14,120 @@ export const addProduct = async (req, res, next) => {
       stock,
       category,
       description,
+      farmer: farmerId,
     });
 
-    farmer.products.push(product._id);
-    await farmer.save();
+    await Farmer.findByIdAndUpdate(farmerId, {
+      $push: { products: product._id },
+    });
 
     res.status(201).json({
-      success: true,
-      message: "Product added successfully!",
-      product,
+      status: "success",
+      data: { product },
     });
   } catch (error) {
-    next(new AppError(error.message, 500));
+    next(new AppError("Failed to add product", 400));
   }
 };
 
-/**
- * UPDATE PRODUCT STOCK
- */
-export const updateStock = async (req, res, next) => {
+// Update product stock
+export const  updateStock = async (req, res, next) => {
   try {
     const { productId, stock } = req.body;
-    const farmer = await Farmer.findOne({ user: req.user.id }).populate(
-      "products"
+    const farmerId = req.user.id;
+    const product = await Product.findOneAndUpdate(
+      { _id: productId, farmer: farmerId },
+      { stock },
+      { new: true, runValidators: true }
     );
-
-    if (!farmer) return next(new AppError("Farmer profile not found!", 404));
-
-    const product = farmer.products.find((p) => p._id.toString() === productId);
-    if (!product) return next(new AppError("Product not found!", 404));
-
-    product.stock = stock;
-    await product.save();
-
-    res.status(200).json({
-      success: true,
-      message: "Stock updated successfully!",
-      product,
-    });
+    if (!product)
+      return next(new AppError("Product not found or not authorized", 404));
+    res.status(200).json({ status: "success", data: { product } });
   } catch (error) {
-    next(new AppError(error.message, 500));
+    next(new AppError("Failed to update stock", 400));
   }
 };
 
-/**
- * DELETE PRODUCT
- */
-export const deleteProduct = async (req, res, next) => {
+// Delete a product
+export const  deleteProduct = async (req, res, next) => {
   try {
     const { productId } = req.params;
-    const farmer = await Farmer.findOne({ user: req.user.id });
+    const farmerId = req.user.id;
 
-    if (!farmer) return next(new AppError("Farmer profile not found!", 404));
+    const product = await Product.findOneAndDelete({
+      _id: productId,
+      farmer: farmerId,
+    });
 
-    farmer.products = farmer.products.filter((p) => p.toString() !== productId);
-    await farmer.save();
+    if (!product)
+      return next(new AppError("Product not found or not authorized", 404));
 
-    await Product.findByIdAndDelete(productId);
+    await Farmer.findByIdAndUpdate(farmerId, {
+      $pull: { products: productId },
+    });
 
-    res.status(200).json({
-      success: true,
-      message: "Product deleted successfully!",
+    res.status(204).json({
+      status: "success",
+      data: null,
     });
   } catch (error) {
-    next(new AppError(error.message, 500));
+    next(new AppError("Failed to delete product", 400));
   }
 };
 
-/**
- * VIEW FARMER'S PRODUCTS
- */
-export const getFarmerProducts = async (req, res, next) => {
+// Get all products added by the farmer
+export const  getFarmerProducts = async (req, res, next) => {
   try {
-    const farmer = await Farmer.findOne({ user: req.user.id }).populate(
-      "products"
-    );
-
-    if (!farmer) return next(new AppError("Farmer profile not found!", 404));
+    const farmerId = req.user.id;
+    const products = await Product.find({ farmer: farmerId });
 
     res.status(200).json({
-      success: true,
-      message: "Products retrieved successfully!",
-      products: farmer.products,
+      status: "success",
+      results: products.length,
+      data: { products },
     });
   } catch (error) {
-    next(new AppError(error.message, 500));
+    next(new AppError("Failed to fetch products", 400));
   }
 };
 
-/**
- * VIEW ORDERS RECEIVED
- */
-export const getOrdersReceived = async (req, res, next) => {
+// Get orders placed for farmer's products
+export const  getOrdersReceived = async (req, res, next) => {
   try {
-    const farmer = await Farmer.findOne({ user: req.user.id });
-
-    if (!farmer) return next(new AppError("Farmer profile not found!", 404));
-
-    const orders = await Order.find()
-      .populate({
-        path: "product",
-        match: { _id: { $in: farmer.products } },
-      })
-      .populate("wholesaler");
-
-    const filteredOrders = orders.filter((order) => order.product !== null);
+    const farmerId = req.user.id;
+    const products = await Product.find({ farmer: farmerId });
+    const productIds = products.map((product) => product._id);
+    const orders = await Order.find({ product: { $in: productIds } });
 
     res.status(200).json({
-      success: true,
-      message: "Orders retrieved successfully!",
-      orders: filteredOrders,
+      status: "success",
+      results: orders.length,
+      data: { orders },
     });
   } catch (error) {
-    next(new AppError(error.message, 500));
+    next(new AppError("Failed to fetch orders", 400));
   }
 };
 
-/**
- * UPDATE FARMER PROFILE
- */
-export const updateProfile = async (req, res, next) => {
+// Update farmer profile
+export const   updateProfile = async (req, res, next) => {
   try {
+    const farmerId = req.user.id;
     const { farmName, farmSize, location } = req.body;
+
     const farmer = await Farmer.findOneAndUpdate(
-      { user: req.user.id },
+      { user: farmerId },
       { farmName, farmSize, location },
       { new: true, runValidators: true }
     );
 
+    if (!farmer) return next(new AppError("Farmer profile not found", 404));
+
     res.status(200).json({
-      success: true,
-      message: "Profile updated successfully!",
-      farmer,
+      status: "success",
+      data: { farmer },
     });
   } catch (error) {
-    next(new AppError(error.message, 500));
+    next(new AppError("Failed to update profile", 400));
   }
 };

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect } from "react";
 import { FaRegArrowAltCircleLeft } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import Footer from "./Footer";
@@ -16,60 +16,19 @@ const Dashboard = () => {
     dispatch(logout());
   }
 
-  useState(() => {
+  useEffect(() => {
     AOS.init({
       duration: 1000,
       once: false,
       mirror: false,
     });
-  });
-
-  // Farmer-specific actions (placeholders)
-  const handleAddProduct = () => {
-    navigate("/farmer/add-product"); // Example route
-  };
-
-  const handleUpdateStock = () => {
-    navigate("/farmer/update-stock"); // Example route
-  };
-
-  const handleDeleteProduct = () => {
-    navigate("/farmer/delete-product"); // Example route
-  };
-
-  const handleViewFarmerProducts = () => {
-    navigate("/farmer/products"); // Example route
-  };
-
-  const handleViewOrdersReceived = () => {
-    navigate("/farmer/orders-received"); // Example route
-  };
-
-  const handleUpdateProfileFarmer = () => {
-    navigate("/farmer/update-profile"); // Example route
-  };
-
-  // Wholesaler-specific actions (placeholders)
-  const handlePurchaseProduct = () => {
-    navigate("/wholesaler/purchase-product"); // Example route
-  };
-
-  const handleViewOrderHistory = () => {
-    navigate("/wholesaler/order-history"); // Example route
-  };
-
-  const handleViewAvailableProducts = () => {
-    navigate("/wholesaler/available-products"); // Example route
-  };
-
-  const handleUpdateProfileWholesaler = () => {
-    navigate("/wholesaler/update-profile"); // Example route
-  };
+  }, []);
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
       <Header className="w-full" />
       <div className="flex flex-col items-center mt-6 mb-6 overflow-x-auto overflow-y-auto p-3.5 max-w-md mx-auto bg-white shadow-lg rounded-lg relative">
+        {/* Back Button */}
         <button
           className="absolute left-4 top-4 flex items-center justify-center text-gray-700 hover:text-gray-900"
           onClick={() => navigate(-1)}
@@ -77,6 +36,7 @@ const Dashboard = () => {
         >
           <FaRegArrowAltCircleLeft className="text-2xl" />
         </button>
+        {/* Profile Section */}
         <div className="flex flex-col items-center justify-between">
           <img
             src={userData?.avatar?.secure_url}
@@ -90,116 +50,104 @@ const Dashboard = () => {
             Logout
           </button>
           <h1 className="text-2xl font-bold mb-2 capitalize text-center">
-            {userData.fullname}
+            {userData?.fullname || "User"}
           </h1>
           <div className="grid grid-cols-2 gap-1 w-full">
             <p className="text-gray-700 mb-1 text-lg font-bold text-left">
-              Email :
+              Email:
             </p>
-            <p className="text-left">{userData.email}</p>
+            <p className="text-left">{userData?.email || "N/A"}</p>
             <p className="text-gray-700 mb-1 text-lg font-bold text-left">
-              User Type :
+              User Type:
             </p>
-            <p className="text-left">{userData.role}</p>
+            <p className="text-left">{userData?.role || "N/A"}</p>
           </div>
         </div>
-
-        {/* Grid container for buttons */}
+        {/* Navigation Buttons */}
         <div className="grid grid-cols-2 gap-4 w-full mt-6">
-          {/* Common button for all roles */}
-          {userData.role && (
+          {/* Common to all authenticated users */}
+          {userData?.role && (
             <button
               onClick={() => navigate("/previous-order")}
-              className="px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+              className="px-4 py-2 bg-[#004526] text-white font-semibold rounded-lg shadow-md hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
             >
               Previous Orders
             </button>
           )}
 
-          {/* Farmer-specific buttons */}
-          {userData.role === "FARMER" && (
+          {/* Farmer-specific options */}
+          {userData?.role === "FARMER" && (
             <>
               <button
-                onClick={handleAddProduct}
-                className="px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+                onClick={() => navigate("/farmer/add-product")}
+                className="px-4 py-2 bg-[#004526] text-white font-semibold rounded-lg shadow-md hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
               >
                 Add Product
               </button>
+
               <button
-                onClick={handleUpdateStock}
-                className="px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+                onClick={() => navigate("/farmer/products")}
+                className="px-4 py-2 bg-[#004526] text-white font-semibold rounded-lg shadow-md hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
               >
-                Update Stock
+                View & Manage Products
               </button>
               <button
-                onClick={handleDeleteProduct}
-                className="px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
-              >
-                Delete Product
-              </button>
-              <button
-                onClick={handleViewFarmerProducts}
-                className="px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
-              >
-                View Products
-              </button>
-              <button
-                onClick={handleViewOrdersReceived}
-                className="px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+                onClick={() => navigate("/farmer/orders-received")}
+                className="px-4 py-2 bg-[#004526] text-white font-semibold rounded-lg shadow-md hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
               >
                 View Orders Received
               </button>
               <button
-                onClick={handleUpdateProfileFarmer}
-                className="px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+                onClick={() => navigate("/farmer/update-profile")}
+                className="px-4 py-2 bg-[#004526] text-white font-semibold rounded-lg shadow-md hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
               >
                 Update Profile
               </button>
             </>
           )}
 
-          {/* Wholesaler-specific buttons */}
-          {userData.role === "WHOLESALER" && (
+          {/* Wholesaler-specific options */}
+          {userData?.role === "WHOLESALER" && (
             <>
               <button
-                onClick={handlePurchaseProduct}
-                className="px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+                onClick={() => navigate("/wholesaler/purchase")}
+                className="px-4 py-2 bg-[#004526] text-white font-semibold rounded-lg shadow-md hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
               >
                 Purchase Product
               </button>
               <button
-                onClick={handleViewOrderHistory}
-                className="px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+                onClick={() => navigate("/wholesaler/orders")}
+                className="px-4 py-2 bg-[#004526] text-white font-semibold rounded-lg shadow-md hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
               >
                 View Order History
               </button>
               <button
-                onClick={handleViewAvailableProducts}
-                className="px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+                onClick={() => navigate("/wholesaler/products")}
+                className="px-4 py-2 bg-[#004526] text-white font-semibold rounded-lg shadow-md hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
               >
                 View Available Products
               </button>
               <button
-                onClick={handleUpdateProfileWholesaler}
-                className="px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+                onClick={() => navigate("/wholesaler/profile")}
+                className="px-4 py-2 bg-[#004526] text-white font-semibold rounded-lg shadow-md hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
               >
                 Update Profile
               </button>
             </>
           )}
 
-          {/* Admin-specific buttons (existing) */}
-          {userData.role === "ADMIN" && (
+          {/* Admin-specific options */}
+          {userData?.role === "ADMIN" && (
             <>
               <button
                 onClick={() => navigate("/createItem")}
-                className="px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+                className="px-4 py-2 bg-[#004526] text-white font-semibold rounded-lg shadow-md hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
               >
                 Add Product
               </button>
               <button
                 onClick={() => navigate("/analytics")}
-                className="px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+                className="px-4 py-2 bg-[#004526] text-white font-semibold rounded-lg shadow-md hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
               >
                 View Analytics
               </button>
@@ -208,6 +156,24 @@ const Dashboard = () => {
                 className="px-4 py-2 bg-green-500 text-white font-semibold rounded-lg shadow-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
               >
                 User Management
+              </button>
+            </>
+          )}
+
+          {/* Customer-specific options */}
+          {userData?.role === "CUSTOMER" && (
+            <>
+              <button
+                onClick={() => navigate("/products")}
+                className="px-4 py-2 bg-[#004526] text-white font-semibold rounded-lg shadow-md hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+              >
+                Browse Products
+              </button>
+              <button
+                onClick={() => navigate("/cart")}
+                className="px-4 py-2 bg-[#004526] text-white font-semibold rounded-lg shadow-md hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+              >
+                View Cart
               </button>
             </>
           )}

@@ -92,7 +92,7 @@ const AddProduct = () => {
             />
             <button
               type="submit"
-              className="bg-blue-500 text-white py-2 px-4 rounded-lg w-full"
+              className="bg-[#004526] text-white py-2 px-4 rounded-lg w-full"
             >
               Add Product
             </button>

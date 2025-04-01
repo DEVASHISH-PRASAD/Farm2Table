@@ -7,7 +7,7 @@ import {
   getOrdersReceived,
   updateProfile,
 } from "../controllers/farmerController.js";
-import { isLoggedIn } from "../middlewares/authMiddleware.js";
+import { isLoggedIn,  } from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 
@@ -15,10 +15,10 @@ const router = express.Router();
 router.post("/product", isLoggedIn, addProduct);
 
 // Update product stock
-router.put("/product/stock", isLoggedIn,updateStock);
+router.put("/product/stock", isLoggedIn, updateStock);
 
 // Delete a product
-router.delete("/product/:productId", isLoggedIn,  deleteProduct);
+router.delete("/product/:productId", isLoggedIn, deleteProduct);
 
 // Get all products added by the farmer
 router.get("/products", isLoggedIn, getFarmerProducts);
@@ -27,6 +27,6 @@ router.get("/products", isLoggedIn, getFarmerProducts);
 router.get("/orders", isLoggedIn, getOrdersReceived);
 
 // Update farmer profile
-router.put("/profile", isLoggedIn,  updateProfile);
+router.put("/profile", isLoggedIn, updateProfile);
 
 export default router;

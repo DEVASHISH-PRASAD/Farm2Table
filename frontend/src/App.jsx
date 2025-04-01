@@ -25,7 +25,6 @@ import Page404 from "./Pages/Page404";
 // Farmer Pages
 import AddProduct from "./components/Farmer/AddProduct";
 import UpdateStock from "./components/Farmer/UpdateStock";
-import DeleteProduct from "./components/Farmer/DeleteProduct";
 import ViewProducts from "./components/Farmer/ViewProducts";
 import ViewOrdersReceived from "./components/Farmer/ViewOrdersReceived";
 import UpdateProfileFarmer from "./components/Farmer/UpdateProfileFarmer";
@@ -78,16 +77,12 @@ function App() {
         </Route>
 
         {/* Farmer Routes */}
-        <Route element={<RequireAuth allowedRoles={["FARMER"]} />}>
-          <Route path="/farmer/add-product" element={<AddProduct />} />
-          <Route path="/farmer/update-stock" element={<UpdateStock />} />
-          <Route path="/farmer/delete-product" element={<DeleteProduct />} />
-          <Route path="/farmer/products" element={<ViewProducts />} />
-          <Route
-            path="/farmer/orders-received"
-            element={<ViewOrdersReceived />}
-          />
-          <Route path="/farmer/update-profile" element={<UpdateProfileFarmer />} />
+          <Route element={<RequireAuth allowedRoles={["FARMER"]} />}>
+            <Route path="/farmer/add-product" element={<AddProduct />} />
+            <Route path="/farmer/products" element={<ViewProducts />} />
+            <Route path="/farmer/orders-received" element={<ViewOrdersReceived />} />
+            <Route path="/farmer/update-profile" element={<UpdateProfileFarmer />} />
+          
         </Route>
 
         {/* Wholesaler Routes */}

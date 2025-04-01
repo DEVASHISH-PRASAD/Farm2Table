@@ -28,6 +28,41 @@ const UpdateProfileFarmer = () => {
     }
   };
 
+  const handleGetLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          setFormData({
+            ...formData,
+            location: {
+              latitude: latitude.toString(),
+              longitude: longitude.toString(),
+            },
+          });
+          toast.success("Location fetched successfully!");
+        },
+        (error) => {
+          switch (error.code) {
+            case error.PERMISSION_DENIED:
+              toast.error("Please allow location access to use this feature.");
+              break;
+            case error.POSITION_UNAVAILABLE:
+              toast.error("Location information is unavailable.");
+              break;
+            case error.TIMEOUT:
+              toast.error("The request to get location timed out.");
+              break;
+            default:
+              toast.error("An error occurred while fetching location.");
+          }
+        }
+      );
+    } else {
+      toast.error("Geolocation is not supported by your browser.");
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -68,28 +103,39 @@ const UpdateProfileFarmer = () => {
               name="farmSize"
               value={formData.farmSize}
               onChange={handleChange}
-              placeholder="Farm Size"
+              placeholder="Farm Size (in acres)"
               className="input input-bordered w-full mb-4"
             />
-            <input
-              type="number"
-              name="latitude"
-              value={formData.location.latitude}
-              onChange={handleChange}
-              placeholder="Latitude"
-              className="input input-bordered w-full mb-4"
-            />
-            <input
-              type="number"
-              name="longitude"
-              value={formData.location.longitude}
-              onChange={handleChange}
-              placeholder="Longitude"
-              className="input input-bordered w-full mb-4"
-            />
+            <div className="flex flex-col mb-4">
+              <input
+                type="number"
+                name="latitude"
+                readOnly
+                value={formData.location.latitude}
+                onChange={handleChange}
+                placeholder="Latitude"
+                className="input input-bordered w-full mb-2"
+              />
+              <input
+                type="number"
+                name="longitude"
+                readOnly
+                value={formData.location.longitude}
+                onChange={handleChange}
+                placeholder="Longitude"
+                className="input input-bordered w-full mb-2"
+              />
+              <button
+                type="button"
+                onClick={handleGetLocation}
+                className="bg-green-500 text-white py-2 px-4 rounded-lg w-full hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
+              >
+                Get Current Location
+              </button>
+            </div>
             <button
               type="submit"
-              className="bg-blue-500 text-white py-2 px-4 rounded-lg w-full"
+              className="bg-[#004526] text-white py-2 px-4 rounded-lg w-full hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
             >
               Update Profile
             </button>
