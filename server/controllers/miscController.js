@@ -10,12 +10,7 @@ export const contactUs = async (req, res, next) => {
 
   try {
     const subject = "Contact Us Form Submission";
-<<<<<<< HEAD
-    const logoUrl =
-      "https://res.cloudinary.com/djolaenik/image/upload/v1728111251/F2M/kphj27bv5fw9hglp7ptg.png"; // Replace with a hosted image URL
-=======
-    const logoUrl = "https://res.cloudinary.com/djolaenik/image/upload/v1728111251/F2M/kphj27bv5fw9hglp7ptg.png"; // Replace with a hosted image URL
->>>>>>> 1b0c7505ec70a626295c1bf89c1be14c5e10cd3d
+    const logoUrl = "https://res.cloudinary.com/djolaenik/image/upload/v1728111251/F2M/kphj27bv5fw9hglp7ptg.png"; 
 
     const htmlMessage = `
       <div style="font-family: Arial, sans-serif; color: #333;">
