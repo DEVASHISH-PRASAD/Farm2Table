@@ -46,8 +46,6 @@ const handleGetLocation = () => {
         setFormData((prevData) => ({
           ...prevData,
           location: {
-            latitude: latitude.toString(),
-            longitude: longitude.toString(),
             coordinates: [longitude, latitude],
           },
         }));
