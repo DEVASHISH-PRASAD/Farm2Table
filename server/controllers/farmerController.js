@@ -3,7 +3,7 @@ import Product from "../models/productModel.js";
 import Order from "../models/orderModel.js";
 import AppError from "../utils/errorUtil.js";
 
-export const     addProduct = async (req, res, next) => {
+export const  addProduct = async (req, res, next) => {
   try {
     const { name, price, stock, category, description } = req.body;
     const farmerId = req.user.id;
