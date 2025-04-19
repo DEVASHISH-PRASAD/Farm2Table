@@ -16,18 +16,27 @@ const UpdateProfileFarmer = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-   if(name === "latitude" || name === "longitude") {
-  const updatedLocation = {
-    ...formData.location,
-    [name]: parseFloat(value)
-  };
-  const { latitude, longitude } = updatedLocation;
-  updatedLocation.coordinates = [parseFloat(longitude), parseFloat(latitude)];
-  setFormData({ ...formData, location: updatedLocation });
-}
-  };
+ const handleChange = (e) => {
+   const { name, value } = e.target;
+
+   if (name === "latitude" || name === "longitude") {
+     const updatedLocation = {
+       ...formData.location,
+       [name]: value,
+     };
+     const { latitude, longitude } = updatedLocation;
+     // Only update coordinates if both lat/lng are valid numbers
+     if (!isNaN(latitude) && !isNaN(longitude)) {
+       updatedLocation.coordinates = [
+         parseFloat(longitude),
+         parseFloat(latitude),
+       ];
+     }
+     setFormData({ ...formData, location: updatedLocation });
+   } else {
+     setFormData({ ...formData, [name]: value });
+   }
+ };
 
   const handleGetLocation = () => {
     if (navigator.geolocation) {
