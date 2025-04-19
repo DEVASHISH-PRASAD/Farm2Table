@@ -4,7 +4,7 @@ const itemSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
-    unique: true,
+    unique: true, 
     trim: true,
   },
   img: {
@@ -16,12 +16,12 @@ const itemSchema = new mongoose.Schema({
     },
   },
   price: {
-    type: Number, // Changed from String to Number
+    type: String, 
     required: true,
   },
   category: {
     type: String,
-    enum: ["fruits", "grains", "vegetables"], // Note: Case differs from controller (Vegetables vs vegetables)
+    enum: ["fruits", "grains", "vegetables"],
     required: true,
   },
   quantity: {
@@ -31,29 +31,21 @@ const itemSchema = new mongoose.Schema({
   },
   soldInPieces: {
     type: Boolean,
-    default: false,
+    default: false, // False by default
   },
   soldInDozen: {
     type: Boolean,
-    default: false,
+    default: false, // False by default
   },
   soldByWeight: {
     type: Boolean,
-    default: true,
-  },
-  description: {
-    type: String,
-    default: "", // Added to match addProduct
-  },
-  farmer: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Farmer",
-    required: true, // Links to the farmer who owns the item
+    default: true, // True by default
   },
   createdAt: {
     type: Date,
     default: Date.now,
   },
+  // field for tracking sales per month
   monthlySales: {
     type: Number,
     default: 0,
