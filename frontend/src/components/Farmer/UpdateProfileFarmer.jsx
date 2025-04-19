@@ -11,21 +11,22 @@ const UpdateProfileFarmer = () => {
   const [formData, setFormData] = useState({
     farmName: "",
     farmSize: "",
-    location: { latitude: "", longitude: "" },
+    location: { coordinates: [] },
   });
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    if (name === "latitude" || name === "longitude") {
-      setFormData({
-        ...formData,
-        location: { ...formData.location, [name]: value },
-      });
-    } else {
-      setFormData({ ...formData, [name]: value });
-    }
+   if(name === "latitude" || name === "longitude") {
+  const updatedLocation = {
+    ...formData.location,
+    [name]: parseFloat(value)
+  };
+  const { latitude, longitude } = updatedLocation;
+  updatedLocation.coordinates = [parseFloat(longitude), parseFloat(latitude)];
+  setFormData({ ...formData, location: updatedLocation });
+}
   };
 
   const handleGetLocation = () => {
