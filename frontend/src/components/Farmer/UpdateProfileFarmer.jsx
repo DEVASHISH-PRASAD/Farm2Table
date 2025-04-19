@@ -38,40 +38,41 @@ const UpdateProfileFarmer = () => {
    }
  };
 
-  const handleGetLocation = () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const { latitude, longitude } = position.coords;
-          setFormData({
-            ...formData,
-            location: {
-              latitude: latitude.toString(),
-              longitude: longitude.toString(),
-            },
-          });
-          toast.success("Location fetched successfully!");
-        },
-        (error) => {
-          switch (error.code) {
-            case error.PERMISSION_DENIED:
-              toast.error("Please allow location access to use this feature.");
-              break;
-            case error.POSITION_UNAVAILABLE:
-              toast.error("Location information is unavailable.");
-              break;
-            case error.TIMEOUT:
-              toast.error("The request to get location timed out.");
-              break;
-            default:
-              toast.error("An error occurred while fetching location.");
-          }
+const handleGetLocation = () => {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        setFormData((prevData) => ({
+          ...prevData,
+          location: {
+            latitude: latitude.toString(),
+            longitude: longitude.toString(),
+            coordinates: [longitude, latitude],
+          },
+        }));
+        toast.success("Location fetched successfully!");
+      },
+      (error) => {
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            toast.error("Please allow location access to use this feature.");
+            break;
+          case error.POSITION_UNAVAILABLE:
+            toast.error("Location information is unavailable.");
+            break;
+          case error.TIMEOUT:
+            toast.error("The request to get location timed out.");
+            break;
+          default:
+            toast.error("An error occurred while fetching location.");
         }
-      );
-    } else {
-      toast.error("Geolocation is not supported by your browser.");
-    }
-  };
+      }
+    );
+  } else {
+    toast.error("Geolocation is not supported by your browser.");
+  }
+};
 
   const handleSubmit = async (e) => {
     e.preventDefault();
