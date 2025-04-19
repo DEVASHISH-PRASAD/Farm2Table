@@ -12,7 +12,7 @@ const AddProduct = () => {
   const [formData, setFormData] = useState({
     name: "",
     price: "",
-    stock: "",
+    quantity: "",
     category: "",
     description: "",
   });
@@ -125,16 +125,16 @@ const AddProduct = () => {
             {/* Stock */}
             <div>
               <label
-                htmlFor="stock"
+                htmlFor="quantity"
                 className="block text-sm font-medium text-gray-700 mb-1"
               >
                 Stock (kg)
               </label>
               <input
                 type="number"
-                id="stock"
-                name="stock"
-                value={formData.stock}
+                id="quantity"
+                name="quantity"
+                value={formData.quantity}
                 onChange={handleChange}
                 placeholder="Enter Stock (e.g., 50)"
                 className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004526] transition-all duration-200"
