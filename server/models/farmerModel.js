@@ -37,37 +37,13 @@ const farmerSchema = new Schema(
     },
     products: [
       {
-        name: {
-          type: String,
-          required: [true, "Product name is required"],
-          trim: true,
-        },
-        price: {
-          type: Number,
-          required: [true, "Price is required"],
-          min: [0, "Price cannot be negative"],
-        },
-        quantity: {
-          type: Number,
-          required: [true, "Quantity is required"],
-          min: [0, "Quantity cannot be negative"],
-        },
-        category: {
-          type: String,
-          required: [true, "Category is required"],
-          enum: ["fruits", "grains", "vegetables"],
-        },
-        description: {
-          type: String,
-          default: "",
-        },
-        createdAt: {
-          type: Date,
-          default: Date.now,
-        },
-        monthlySales: {
-          type: Number,
-          default: 0,
+        type: Schema.Types.ObjectId,
+        ref: "Product",
+        validate: {
+          validator: function (v) {
+            return v != null; // Ensure valid ObjectId
+          },
+          message: "Invalid product reference",
         },
       },
     ],
@@ -94,18 +70,12 @@ farmerSchema.index({ location: "2dsphere" });
 // Index for faster lookups by user
 farmerSchema.index({ user: 1 });
 
-// Virtual to populate products (optional, now redundant since products are embedded)
+// Corrected virtual with foreignField
 farmerSchema.virtual("productDetails", {
-  ref: "Product", // This can be removed or adjusted if no separate Product model exists
+  ref: "Product",
   localField: "products",
-  virtualField: "_id",
+  foreignField: "_id", // Added this to specify the field in Product to match
 });
-
-// Custom method to add a product (optional, for convenience)
-farmerSchema.methods.addProduct = function (productData) {
-  this.products.push(productData);
-  return this.save();
-};
 
 const Farmer = model("Farmer", farmerSchema);
 export default Farmer;
