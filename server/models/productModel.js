@@ -4,7 +4,7 @@ const itemSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
-    unique: true, 
+    unique: true,
     trim: true,
   },
   img: {
@@ -16,7 +16,7 @@ const itemSchema = new mongoose.Schema({
     },
   },
   price: {
-    type: String, 
+    type: String,
     required: true,
   },
   category: {
