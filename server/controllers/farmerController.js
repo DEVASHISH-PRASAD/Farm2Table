@@ -1,32 +1,62 @@
 import Farmer from "../models/farmerModel.js";
-import Product from "../models/productModel.js";
+import Item from "../models/productModel.js";
 import Order from "../models/orderModel.js";
 import AppError from "../utils/errorUtil.js";
 
-export const  addProduct = async (req, res, next) => {
+export const addProduct = async (req, res, next) => {
   try {
-    const { name, price, stock, category, description } = req.body;
-    const farmerId = req.user.id;
+    console.log("Request Body:", req.body);
+    console.log("Farmer ID from req.user:", req.user?.id);
 
-    const product = await Product.create({
+    const farmerId = req.user?.id;
+    if (!farmerId) {
+      return next(new AppError("Authentication required or invalid user", 401));
+    }
+
+    const { name, price, quantity, category, description } = req.body; // Changed stock to quantity
+    if (!name || !price || !quantity || !category) {
+      return next(new AppError("Missing required fields", 400));
+    }
+
+    const parsedPrice = parseFloat(price);
+    const parsedQuantity = parseInt(quantity, 10);
+    if (isNaN(parsedPrice) || isNaN(parsedQuantity)) {
+      return next(new AppError("Price and quantity must be numbers", 400));
+    }
+
+    // Handle category case sensitivity
+    const normalizedCategory = category.toLowerCase();
+    if (!["fruits", "grains", "vegetables"].includes(normalizedCategory)) {
+      return next(new AppError("Invalid category", 400));
+    }
+
+    const item = await Item.create({
       name,
-      price,
-      stock,
-      category,
-      description,
+      price: parsedPrice,
+      quantity: parsedQuantity,
+      category: normalizedCategory,
+      description: description || "",
       farmer: farmerId,
     });
 
-    await Farmer.findByIdAndUpdate(farmerId, {
-      $push: { products: product._id },
-    });
+    console.log("Created Item:", item);
+
+    const farmer = await Farmer.findByIdAndUpdate(
+      farmerId,
+      { $push: { products: item._id } },
+      { new: true, runValidators: true }
+    );
+    if (!farmer) {
+      return next(new AppError("Farmer not found", 404));
+    }
 
     res.status(201).json({
       status: "success",
-      data: { product },
+      data: { item }, // Changed product to item
     });
   } catch (error) {
-    next(new AppError("Failed to add product", 400));
+    console.error("Error Details:", error);
+    next(new AppError(error.message || "Failed to add item", 400));
   }
 };
 
@@ -35,7 +65,7 @@ export const  updateStock = async (req, res, next) => {
   try {
     const { productId, stock } = req.body;
     const farmerId = req.user.id;
-    const product = await Product.findOneAndUpdate(
+    const product = await Item.findOneAndUpdate(
       { _id: productId, farmer: farmerId },
       { stock },
       { new: true, runValidators: true }
@@ -79,7 +109,7 @@ export const  deleteProduct = async (req, res, next) => {
 export const  getFarmerProducts = async (req, res, next) => {
   try {
     const farmerId = req.user.id;
-    const products = await Product.find({ farmer: farmerId });
+    const products = await Item.find({ farmer: farmerId });
 
     res.status(200).json({
       status: "success",
@@ -95,7 +125,7 @@ export const  getFarmerProducts = async (req, res, next) => {
 export const  getOrdersReceived = async (req, res, next) => {
   try {
     const farmerId = req.user.id;
-    const products = await Product.find({ farmer: farmerId });
+    const products = await Item.find({ farmer: farmerId });
     const productIds = products.map((product) => product._id);
     const orders = await Order.find({ product: { $in: productIds } });
 
