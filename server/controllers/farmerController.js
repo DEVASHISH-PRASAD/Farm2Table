@@ -1,6 +1,7 @@
 import Farmer from "../models/farmerModel.js";
-import Product from "../models/productModel.js"; // Corrected to Product
+import Product from "../models/productModel.js";
 import Order from "../models/orderModel.js";
+import UserData from "../models/userModel.js"; // Added UserData import
 import AppError from "../utils/errorUtil.js";
 
 export const addProduct = async (req, res, next) => {
@@ -8,9 +9,15 @@ export const addProduct = async (req, res, next) => {
     console.log("Request Body:", req.body);
     console.log("Farmer ID from req.user:", req.user?.id);
 
-    const farmerId = req.user?.id;
-    if (!farmerId) {
+    const userId = req.user?.id;
+    if (!userId) {
       return next(new AppError("Authentication required or invalid user", 401));
+    }
+
+    // Validate user role from UserData
+    const user = await UserData.findById(userId).select("+role"); // Include role despite select: false
+    if (!user || user.role !== "farmer") {
+      return next(new AppError("Only farmers can add products", 403));
     }
 
     const { name, price, quantity, category, description } = req.body;
@@ -29,24 +36,40 @@ export const addProduct = async (req, res, next) => {
       return next(new AppError("Invalid category", 400));
     }
 
+    // Check if Farmer document exists, create if not
+    let farmer = await Farmer.findOne({ user: userId });
+    if (!farmer) {
+      farmer = await Farmer.create({
+        user: userId,
+        farmName: `${user.fullname}'s Farm`, // Default farm name based on user
+        farmSize: 1.0, // Default value
+        location: {
+          coordinates: [0.0, 0.0], // Default coordinates (update via profile)
+        },
+        certifications: [],
+      });
+      console.log("Created new Farmer:", farmer);
+    }
+
     const product = await Product.create({
       name,
       price: parsedPrice,
       quantity: parsedQuantity,
       category: normalizedCategory,
       description: description || "",
-      farmer: farmerId,
+      farmer: farmer._id,
     });
 
     console.log("Created Product:", product);
 
-    const farmer = await Farmer.findByIdAndUpdate(
-      farmerId,
+    // Update farmer's products array
+    farmer = await Farmer.findByIdAndUpdate(
+      farmer._id,
       { $push: { products: product._id } },
       { new: true, runValidators: true }
     );
     if (!farmer) {
-      return next(new AppError("Farmer not found", 404));
+      return next(new AppError("Farmer not found after update", 404));
     }
 
     res.status(201).json({
@@ -62,11 +85,11 @@ export const addProduct = async (req, res, next) => {
 // Update product stock
 export const updateStock = async (req, res, next) => {
   try {
-    const { productId, quantity } = req.body; // Changed stock to quantity to match schema
+    const { productId, quantity } = req.body;
     const farmerId = req.user.id;
     const product = await Product.findOneAndUpdate(
       { _id: productId, farmer: farmerId },
-      { quantity }, // Updated to match schema field
+      { quantity },
       { new: true, runValidators: true }
     );
     if (!product) {
@@ -85,7 +108,6 @@ export const deleteProduct = async (req, res, next) => {
     const farmerId = req.user.id;
 
     const product = await Product.findOneAndDelete({
-      // Corrected to Product
       _id: productId,
       farmer: farmerId,
     });
