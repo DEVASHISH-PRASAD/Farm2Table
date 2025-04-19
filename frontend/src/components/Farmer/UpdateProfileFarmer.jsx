@@ -11,7 +11,11 @@ const UpdateProfileFarmer = () => {
   const [formData, setFormData] = useState({
     farmName: "",
     farmSize: "",
-    location: { coordinates: [] },
+    location: {
+      latitude: "",
+      longitude: "",
+      coordinates: [],
+    },
   });
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -37,7 +41,6 @@ const UpdateProfileFarmer = () => {
      setFormData({ ...formData, [name]: value });
    }
  };
-
 const handleGetLocation = () => {
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(
@@ -46,7 +49,9 @@ const handleGetLocation = () => {
         setFormData((prevData) => ({
           ...prevData,
           location: {
-            coordinates: [longitude, latitude],
+            latitude: latitude.toString(),
+            longitude: longitude.toString(),
+            coordinates: [parseFloat(longitude), parseFloat(latitude)],
           },
         }));
         toast.success("Location fetched successfully!");
@@ -72,16 +77,34 @@ const handleGetLocation = () => {
   }
 };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      await dispatch(updateProfileFarmer(formData)).unwrap();
-      toast.success("Profile updated successfully!");
-      navigate("/dashboard");
-    } catch (error) {
-      toast.error(error || "Failed to update profile");
-    }
+
+const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  const { latitude, longitude, coordinates } = formData.location;
+
+  if (!latitude || !longitude || coordinates.length !== 2) {
+    toast.error("Please provide a valid location.");
+    return;
+  }
+
+  const formattedData = {
+    ...formData,
+    location: {
+      type: "Point",
+      coordinates: coordinates,
+    },
   };
+
+  try {
+    await dispatch(updateProfileFarmer(formattedData)).unwrap();
+    toast.success("Profile updated successfully!");
+    navigate("/dashboard");
+  } catch (error) {
+    toast.error(error || "Failed to update profile");
+  }
+};
+
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
