@@ -16,7 +16,7 @@ export const addProduct = async (req, res, next) => {
 
     // Validate user role from UserData
     const user = await UserData.findById(userId).select("+role"); // Include role despite select: false
-    if (!user || user.role !== "farmer") {
+    if (!user || user.role !== "FARMER") {
       return next(new AppError("Only farmers can add products", 403));
     }
 
