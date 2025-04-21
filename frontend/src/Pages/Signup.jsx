@@ -291,7 +291,6 @@ const SignupForm = () => {
               <select name="role" value={formData.role} onChange={handleChange} className="input input-bordered w-full px-4 py-2">
                 <option value="CUSTOMER">CUSTOMER</option>
                 <option value="FARMER">FARMER</option>
-                <option value="WHOLESALER">WHOLESALER</option>
               </select>
             </div>
 

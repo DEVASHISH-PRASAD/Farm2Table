@@ -1,27 +1,37 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  getFarmerProducts,
-  deleteProduct,
+  getAllFarmerProducts,
+  createAdminOrder,
+  getAllUsers,
 } from "../../Redux/Slices/farmerSlice";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import Header from "../../Pages/Header";
 import Footer from "../../Pages/Footer";
-import { FaRegArrowAltCircleLeft, FaEdit, FaTrash } from "react-icons/fa";
+import { FaRegArrowAltCircleLeft, FaShoppingCart } from "react-icons/fa";
 import AOS from "aos";
 
-const ViewProducts = () => {
+const AdminBuyProducts = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { products, loading, error } = useSelector((state) => state.farmer);
+  const { allProducts, users, loading, error } = useSelector(
+    (state) => state.farmer
+  );
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [sortBy, setSortBy] = useState("name");
   const [sortOrder, setSortOrder] = useState("asc");
-  const [deletingProduct, setDeletingProduct] = useState(null);
+  const [buyModal, setBuyModal] = useState(null);
+  const [orderForm, setOrderForm] = useState({
+    userId: "",
+    quantity: "",
+    paymentMethod: "UPI",
+  });
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    dispatch(getFarmerProducts());
+    dispatch(getAllFarmerProducts());
+    dispatch(getAllUsers());
     AOS.init({
       duration: 1000,
       once: false,
@@ -36,56 +46,68 @@ const ViewProducts = () => {
     }
   }, [error, dispatch]);
 
-  const handleDelete = (productId, productName) => {
-    toast(
-      (t) => (
-        <div>
-          <p>Are you sure you want to delete "{productName}"?</p>
-          <div className="flex justify-end space-x-2 mt-2">
-            <button
-              onClick={() => toast.dismiss(t.id)}
-              className="px-3 py-1 bg-gray-300 text-gray-800 rounded-lg"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={async () => {
-                setDeletingProduct(productId);
-                try {
-                  await dispatch(deleteProduct(productId)).unwrap();
-                  toast.success("Product deleted successfully!", {
-                    duration: 3000,
-                    position: "top-right",
-                  });
-                } catch (err) {
-                  toast.error(err || "Failed to delete product", {
-                    duration: 3000,
-                    position: "top-right",
-                  });
-                } finally {
-                  setDeletingProduct(null);
-                  toast.dismiss(t.id);
-                }
-              }}
-              className="px-3 py-1 bg-red-500 text-white rounded-lg"
-            >
-              Delete
-            </button>
-          </div>
-        </div>
-      ),
-      { duration: Infinity }
-    );
+  const handleBuy = (product) => {
+    setBuyModal(product);
+    setOrderForm({ userId: "", quantity: "", paymentMethod: "UPI" });
   };
 
-  const handleEdit = (productId) => {
-    navigate(`/edit-product/${productId}`);
+  const handleOrderSubmit = async (e) => {
+    e.preventDefault();
+    if (!orderForm.userId || !orderForm.quantity) {
+      toast.error("Please select a user and enter quantity", {
+        duration: 3000,
+        position: "top-right",
+      });
+      return;
+    }
+
+    const parsedQuantity = parseFloat(orderForm.quantity);
+    if (isNaN(parsedQuantity) || parsedQuantity <= 0) {
+      toast.error("Quantity must be a positive number", {
+        duration: 3000,
+        position: "top-right",
+      });
+      return;
+    }
+
+    if (parsedQuantity > buyModal.quantity) {
+      toast.error("Quantity exceeds available stock", {
+        duration: 3000,
+        position: "top-right",
+      });
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      await dispatch(
+        createAdminOrder({
+          userId: orderForm.userId,
+          productId: buyModal._id,
+          farmerId: buyModal.farmerId,
+          quantity: parsedQuantity,
+          paymentMethod: orderForm.paymentMethod,
+        })
+      ).unwrap();
+      toast.success("Order created successfully!", {
+        duration: 3000,
+        position: "top-right",
+      });
+      setBuyModal(null);
+    } catch (err) {
+      toast.error(err || "Failed to create order", {
+        duration: 3000,
+        position: "top-right",
+      });
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const filteredProducts =
     categoryFilter === "all"
-      ? products
-      : products.filter((product) => product.category === categoryFilter);
+      ? allProducts
+      : allProducts.filter((product) => product.category === categoryFilter);
 
   const sortedProducts = [...filteredProducts].sort((a, b) => {
     const order = sortOrder === "asc" ? 1 : -1;
@@ -104,7 +126,7 @@ const ViewProducts = () => {
       <Header className="w-full" />
       <div className="flex flex-col items-center justify-center flex-grow p-6">
         <div
-          className="relative w-full max-w-5xl bg-white shadow-lg rounded-lg p-8 transition-all duration-300 transform hover:shadow-xl"
+          className="relative w-full max-w-6xl bg-white shadow-lg rounded-lg p-8 transition-all duration-300 transform hover:shadow-xl"
           data-aos="fade-up"
         >
           <button
@@ -115,7 +137,7 @@ const ViewProducts = () => {
             <FaRegArrowAltCircleLeft className="text-2xl" />
           </button>
           <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">
-            Your Products
+            Buy Products from Farmers
           </h2>
           <div className="flex flex-col sm:flex-row justify-between mb-4 space-y-4 sm:space-y-0 sm:space-x-4">
             <div>
@@ -214,7 +236,10 @@ const ViewProducts = () => {
                       Description
                     </th>
                     <th className="py-2 px-4 border-b text-left text-sm font-medium text-gray-700">
-                      Actions
+                      Farmer
+                    </th>
+                    <th className="py-2 px-4 border-b text-left text-sm font-medium text-gray-700">
+                      Action
                     </th>
                   </tr>
                 </thead>
@@ -242,6 +267,11 @@ const ViewProducts = () => {
                       </td>
                       <td className="py-2 px-4 border-b text-sm text-gray-600">
                         {product.quantity} kg
+                        {product.quantity < 10 && (
+                          <span className="text-red-500 text-xs ml-2">
+                            Low Stock!
+                          </span>
+                        )}
                       </td>
                       <td className="py-2 px-4 border-b text-sm text-gray-600">
                         {product.category.charAt(0).toUpperCase() +
@@ -250,33 +280,17 @@ const ViewProducts = () => {
                       <td className="py-2 px-4 border-b text-sm text-gray-600">
                         {product.description || "N/A"}
                       </td>
+                      <td className="py-2 px-4 border-b text-sm text-gray-600">
+                        {product.farmerName} ({product.farmerUser})
+                      </td>
                       <td className="py-2 px-4 border-b text-sm">
-                        <div className="flex space-x-2">
-                          <button
-                            onClick={() => handleEdit(product._id)}
-                            className="px-3 py-1 bg-[#004526] text-white rounded-lg hover:bg-[#004540] transition-all duration-200 flex items-center"
-                            aria-label={`Edit ${product.name}`}
-                          >
-                            <FaEdit className="mr-1" /> Edit
-                          </button>
-                          <button
-                            onClick={() =>
-                              handleDelete(product._id, product.name)
-                            }
-                            className={`px-3 py-1 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-all duration-200 flex items-center ${
-                              deletingProduct === product._id
-                                ? "opacity-50 cursor-not-allowed"
-                                : ""
-                            }`}
-                            disabled={deletingProduct === product._id}
-                            aria-label={`Delete ${product.name}`}
-                          >
-                            <FaTrash className="mr-1" />
-                            {deletingProduct === product._id
-                              ? "Deleting..."
-                              : "Delete"}
-                          </button>
-                        </div>
+                        <button
+                          onClick={() => handleBuy(product)}
+                          className="px-3 py-1 bg-[#004526] text-white rounded-lg hover:bg-[#004540] transition-all duration-200 flex items-center"
+                          aria-label={`Buy ${product.name}`}
+                        >
+                          <FaShoppingCart className="mr-1" /> Buy
+                        </button>
                       </td>
                     </tr>
                   ))}
@@ -286,9 +300,114 @@ const ViewProducts = () => {
           )}
         </div>
       </div>
+
+      {/* Buy Modal */}
+      {buyModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div
+            className="bg-white rounded-lg p-6 max-w-md w-full"
+            data-aos="zoom-in"
+          >
+            <h3 className="text-2xl font-bold mb-4 text-gray-800">
+              Buy {buyModal.name}
+            </h3>
+            <form onSubmit={handleOrderSubmit} className="space-y-4">
+              <div>
+                <label
+                  htmlFor="userId"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Select User
+                </label>
+                <select
+                  id="userId"
+                  value={orderForm.userId}
+                  onChange={(e) =>
+                    setOrderForm({ ...orderForm, userId: e.target.value })
+                  }
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004526]"
+                  required
+                >
+                  <option value="">Select a user</option>
+                  {users.map((user) => (
+                    <option key={user._id} value={user._id}>
+                      {user.fullname} ({user.email})
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label
+                  htmlFor="quantity"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Quantity (kg, max: {buyModal.quantity})
+                </label>
+                <input
+                  type="number"
+                  id="quantity"
+                  value={orderForm.quantity}
+                  onChange={(e) =>
+                    setOrderForm({ ...orderForm, quantity: e.target.value })
+                  }
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004526]"
+                  required
+                  min="0.1"
+                  step="0.1"
+                  max={buyModal.quantity}
+                />
+              </div>
+              <div>
+                <label
+                  htmlFor="paymentMethod"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Payment Method
+                </label>
+                <select
+                  id="paymentMethod"
+                  value={orderForm.paymentMethod}
+                  onChange={(e) =>
+                    setOrderForm({
+                      ...orderForm,
+                      paymentMethod: e.target.value,
+                    })
+                  }
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004526]"
+                  required
+                >
+                  <option value="UPI">UPI</option>
+                  <option value="Credit Card">Credit Card</option>
+                  <option value="Debit Card">Debit Card</option>
+                  <option value="Net Banking">Net Banking</option>
+                  <option value="Cash on Delivery">Cash on Delivery</option>
+                </select>
+              </div>
+              <div className="flex justify-end space-x-2">
+                <button
+                  type="button"
+                  onClick={() => setBuyModal(null)}
+                  className="px-4 py-2 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 transition-all duration-200"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className={`px-4 py-2 bg-[#004526] text-white rounded-lg hover:bg-[#004540] transition-all duration-200 ${
+                    submitting ? "opacity-50 cursor-not-allowed" : ""
+                  }`}
+                  disabled={submitting}
+                >
+                  {submitting ? "Placing Order..." : "Place Order"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
       <Footer />
     </div>
   );
 };
 
-export default ViewProducts;
+export default AdminBuyProducts;

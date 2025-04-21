@@ -1,4 +1,3 @@
-// src/App.jsx
 import React, { useEffect } from "react";
 import HomePage from "./Pages/HomePage";
 import "aos/dist/aos.css";
@@ -21,6 +20,7 @@ import RequestResetPasswordPage from "./Pages/User/RequestResetPasswordPage";
 import ResetPasswordPage from "./Pages/User/ResetPasswordPage";
 import PreviousOrder from "./Pages/Cart/PreviousOrder";
 import AnalyticsPage from "./Pages/Admin/AnalyticsPage";
+import AdminBuyProducts from "./components/Admin/AdminBuyProducts"; // New import
 import Page404 from "./Pages/Page404";
 // Farmer Pages
 import AddProduct from "./components/Farmer/AddProduct";
@@ -74,15 +74,23 @@ function App() {
             path="/adminUserManagement"
             element={<AdminUserManagement />}
           />
+          <Route path="/admin/buy-products" element={<AdminBuyProducts />} />{" "}
+          {/* New route */}
         </Route>
 
         {/* Farmer Routes */}
-          <Route element={<RequireAuth allowedRoles={["FARMER"]} />}>
-            <Route path="/farmer/add-product" element={<AddProduct />} />
-            <Route path="/farmer/products" element={<ViewProducts />} />
-            <Route path="/farmer/orders-received" element={<ViewOrdersReceived />} />
-            <Route path="/farmer/update-profile" element={<UpdateProfileFarmer />} />
-          
+        <Route element={<RequireAuth allowedRoles={["FARMER"]} />}>
+          <Route path="/farmer/add-product" element={<AddProduct />} />
+          <Route path="/farmer/products" element={<ViewProducts />} />
+          <Route
+            path="/farmer/orders-received"
+            element={<ViewOrdersReceived />}
+          />
+          <Route
+            path="/farmer/update-profile"
+            element={<UpdateProfileFarmer />}
+          />
+          <Route path="/farmer/update-stock" element={<UpdateStock />} />
         </Route>
 
         {/* Wholesaler Routes */}

@@ -5,8 +5,8 @@ import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import Header from "../../Pages/Header";
 import Footer from "../../Pages/Footer";
-import { FaRegArrowAltCircleLeft } from "react-icons/fa";
-import AOS from "aos"; // For animations
+import { FaRegArrowAltCircleLeft, FaUpload } from "react-icons/fa";
+import AOS from "aos";
 
 const AddProduct = () => {
   const [formData, setFormData] = useState({
@@ -16,11 +16,12 @@ const AddProduct = () => {
     category: "",
     description: "",
   });
-  const [loading, setLoading] = useState(false); // Loading state for submission
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState("");
+  const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  // Initialize AOS for animations
   useEffect(() => {
     AOS.init({
       duration: 1000,
@@ -33,26 +34,64 @@ const AddProduct = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        // 5MB limit
+        toast.error("File size exceeds 5MB.");
+        return;
+      }
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onload = () => {
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true); // Start loading
+    setLoading(true);
+
     try {
-      const response = await dispatch(addProduct(formData)).unwrap();
+      // Client-side validation
+      const price = parseFloat(formData.price);
+      const quantity = parseInt(formData.quantity, 10);
+      if (isNaN(price) || price <= 0 || isNaN(quantity) || quantity < 0) {
+        throw new Error(
+          "Price must be positive and quantity cannot be negative"
+        );
+      }
+
+      // Create FormData for multipart request
+      const data = new FormData();
+      data.append("name", formData.name);
+      data.append("price", formData.price);
+      data.append("quantity", formData.quantity);
+      data.append("category", formData.category.toLowerCase());
+      data.append("description", formData.description);
+      if (imageFile) {
+        data.append("image", imageFile);
+      }
+
+      const response = await dispatch(addProduct(data)).unwrap();
       toast.success("Product added successfully!", {
         duration: 3000,
         position: "top-right",
       });
       navigate("/dashboard");
-      console.log("Success Response:", response); // Log success response
+      console.log("Success Response:", response);
     } catch (error) {
       const errorMessage = error.message || "Failed to add product";
       toast.error(errorMessage, {
         duration: 3000,
         position: "top-right",
       });
-      console.error("Error Response:", error); // Log error response
+      console.error("Error Response:", error);
     } finally {
-      setLoading(false); // Stop loading
+      setLoading(false);
     }
   };
 
@@ -64,7 +103,6 @@ const AddProduct = () => {
           className="relative max-w-md w-full bg-white shadow-lg rounded-lg p-8 transition-all duration-300 transform hover:shadow-xl"
           data-aos="fade-up"
         >
-          {/* Back Button */}
           <button
             className="absolute left-4 top-4 flex items-center justify-center text-gray-700 hover:text-gray-900 transition-colors duration-200"
             onClick={() => navigate("/dashboard")}
@@ -72,15 +110,10 @@ const AddProduct = () => {
           >
             <FaRegArrowAltCircleLeft className="text-2xl" />
           </button>
-
-          {/* Form Header */}
           <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">
             Add New Product
           </h2>
-
-          {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-5">
-            {/* Product Name */}
             <div>
               <label
                 htmlFor="name"
@@ -99,8 +132,6 @@ const AddProduct = () => {
                 required
               />
             </div>
-
-            {/* Price */}
             <div>
               <label
                 htmlFor="price"
@@ -117,12 +148,10 @@ const AddProduct = () => {
                 placeholder="Enter Price (e.g., 30)"
                 className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004526] transition-all duration-200"
                 required
-                min="0"
+                min="0.01"
                 step="0.01"
               />
             </div>
-
-            {/* Stock */}
             <div>
               <label
                 htmlFor="quantity"
@@ -143,8 +172,6 @@ const AddProduct = () => {
                 step="0.1"
               />
             </div>
-
-            {/* Category */}
             <div>
               <label
                 htmlFor="category"
@@ -163,13 +190,11 @@ const AddProduct = () => {
                 <option value="" disabled>
                   Select Category
                 </option>
-                <option value="Vegetables">Vegetables</option>
-                <option value="Fruits">Fruits</option>
-                <option value="Grains">Grains</option>
+                <option value="fruits">Fruits</option>
+                <option value="grains">Grains</option>
+                <option value="vegetables">Vegetables</option>
               </select>
             </div>
-
-            {/* Description */}
             <div>
               <label
                 htmlFor="description"
@@ -186,8 +211,42 @@ const AddProduct = () => {
                 className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004526] transition-all duration-200 h-32 resize-none"
               />
             </div>
-
-            {/* Submit Button */}
+            <div>
+              <label
+                htmlFor="image"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Product Image (Optional)
+              </label>
+              <div className="flex flex-col items-center">
+                <input
+                  type="file"
+                  id="image"
+                  name="image"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className="hidden"
+                />
+                <label
+                  htmlFor="image"
+                  className="cursor-pointer flex flex-col items-center justify-center w-40 h-40 rounded-full border-4 border-gray-300 bg-gray-50 relative"
+                  aria-label="Upload product image"
+                >
+                  {imagePreview ? (
+                    <img
+                      src={imagePreview}
+                      alt="Preview"
+                      className="w-full h-full object-cover rounded-full"
+                    />
+                  ) : (
+                    <>
+                      <FaUpload className="text-gray-500 text-3xl" />
+                      <span className="mt-2 text-gray-600">Upload Image</span>
+                    </>
+                  )}
+                </label>
+              </div>
+            </div>
             <button
               type="submit"
               className={`w-full py-3 px-4 rounded-lg text-white font-semibold transition-all duration-200 ${

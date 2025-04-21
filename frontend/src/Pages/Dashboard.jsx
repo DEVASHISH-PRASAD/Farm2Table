@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../Redux/Slices/AuthSlice";
 import Header from "./Header";
 import AOS from "aos";
+import toast from "react-hot-toast";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -13,7 +14,21 @@ const Dashboard = () => {
   const userData = useSelector((state) => state?.auth?.data);
 
   function handleLogout() {
-    dispatch(logout());
+    dispatch(logout())
+      .unwrap()
+      .then(() => {
+        toast.success("Logged out successfully", {
+          duration: 3000,
+          position: "top-right",
+        });
+        navigate("/login");
+      })
+      .catch((err) => {
+        toast.error(err || "Logout failed", {
+          duration: 3000,
+          position: "top-right",
+        });
+      });
   }
 
   useEffect(() => {
@@ -39,7 +54,9 @@ const Dashboard = () => {
         {/* Profile Section */}
         <div className="flex flex-col items-center justify-between">
           <img
-            src={userData?.avatar?.secure_url}
+            src={
+              userData?.avatar?.secure_url || "https://via.placeholder.com/150"
+            }
             alt="Profile"
             className="w-40 m-auto rounded-full border-4 border-gray-300 shadow-lg"
           />
@@ -84,7 +101,6 @@ const Dashboard = () => {
               >
                 Add Product
               </button>
-
               <button
                 onClick={() => navigate("/farmer/products")}
                 className="px-4 py-2 bg-[#004526] text-white font-semibold rounded-lg shadow-md hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
@@ -156,6 +172,12 @@ const Dashboard = () => {
                 className="px-4 py-2 bg-green-500 text-white font-semibold rounded-lg shadow-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
               >
                 User Management
+              </button>
+              <button
+                onClick={() => navigate("/admin/buy-products")}
+                className="px-4 py-2 bg-[#004526] text-white rounded-lg hover:bg-[#004540] transition-all duration-200"
+              >
+                Buy Products from Farmers
               </button>
             </>
           )}

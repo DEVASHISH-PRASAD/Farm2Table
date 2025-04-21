@@ -1,3 +1,4 @@
+// routes/farmerRoutes.js
 import express from "express";
 import {
   addProduct,
@@ -6,27 +7,44 @@ import {
   getFarmerProducts,
   getOrdersReceived,
   updateProfile,
+  getAllFarmerProducts,
+  getFarmerProfile,
+  getMyProducts,
+  updateOrderDeliveryStatus,
+  updateProduct,
+  createAdminOrder,
+  getAllUsers,
 } from "../controllers/farmerController.js";
-import { isLoggedIn,  } from "../middlewares/authMiddleware.js";
+import { isLoggedIn,authorizeRoles } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-// Add a new product
-router.post("/product", isLoggedIn, addProduct);
-
-// Update product stock
-router.put("/product/stock", isLoggedIn, updateStock);
-
-// Delete a product
-router.delete("/product/:productId", isLoggedIn, deleteProduct);
-
-// Get all products added by the farmer
-router.get("/products", isLoggedIn, getFarmerProducts);
-
-// Get orders placed for farmer's products
+// Farmer routes
+router.get("/profile", authorizeRoles("FARMER"), getFarmerProfile);
+router.post("/products/add", isLoggedIn,upload.single("image"), addProduct);
+router.patch("/products/update-stock", isLoggedIn, updateStock);
+router.delete("/products/:productId", isLoggedIn, deleteProduct);
+router.get("/products/my-products", restrictTo("FARMER"), getMyProducts);
+router.get("/products/my-products", isLoggedIn, getFarmerProducts);
 router.get("/orders", isLoggedIn, getOrdersReceived);
+router.patch("/profile", isLoggedIn, updateProfile);
+router.patch(
+  "/products/update",
+  authorizeRoles("FARMER"),
+  upload.single("image"),
+  updateProduct
+);
+router.get("/products/my-products", authorizeRoles("FARMER"), getMyProducts);
+router.get("/orders", authorizeRoles("FARMER"), getOrdersReceived);
+router.patch(
+  "/orders/delivery-status",
+  authorizeRoles("FARMER"),
+  updateOrderDeliveryStatus
+);
 
-// Update farmer profile
-router.put("/profile", isLoggedIn, updateProfile);
+// Admin route
+router.get("/products/all", authorizeRoles("ADMIN"), getAllFarmerProducts);
+router.post("/orders/admin", authorizeRoles("ADMIN"), createAdminOrder);
+router.get("/users", authorizeRoles("ADMIN"), getAllUsers);
 
 export default router;

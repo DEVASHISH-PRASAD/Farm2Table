@@ -1,4 +1,51 @@
+// models/farmerModel.js
 import { Schema, model } from "mongoose";
+
+const productSchema = new Schema({
+  name: {
+    type: String,
+    required: [true, "Product name is required"],
+    trim: true,
+    unique: true, // Unique within the farmer's products
+  },
+  price: {
+    type: Number,
+    required: [true, "Price is required"],
+    min: [0, "Price cannot be negative"],
+  },
+  quantity: {
+    type: Number,
+    required: [true, "Quantity is required"],
+    min: [0, "Quantity cannot be negative"],
+  },
+  category: {
+    type: String,
+    enum: ["fruits", "grains", "vegetables"],
+    required: [true, "Category is required"],
+  },
+  description: {
+    type: String,
+    default: "",
+    trim: true,
+  },
+  img: {
+    public_id: {
+      type: String,
+    },
+    secure_url: {
+      type: String,
+    },
+  },
+  monthlySales: {
+    type: Number,
+    default: 0,
+    min: [0, "Monthly sales cannot be negative"],
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+});
 
 const farmerSchema = new Schema(
   {
@@ -6,19 +53,19 @@ const farmerSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: "UserData",
       required: [true, "User ID is required"],
-      unique: true, // Ensure one farmer per user
+      unique: true,
     },
     farmName: {
       type: String,
       required: [true, "Farm name is required"],
-      trim: true, // Remove leading/trailing whitespace
+      trim: true,
       minlength: [2, "Farm name must be at least 2 characters"],
       maxlength: [100, "Farm name cannot exceed 100 characters"],
     },
     farmSize: {
-      type: Number, // Acres or hectares
+      type: Number,
       required: [true, "Farm size is required"],
-      min: [0.1, "Farm size must be at least 0.1 acres/hectares"], // Prevent unrealistic values
+      min: [0.1, "Farm size must be at least 0.1 acres/hectares"],
       validate: {
         validator: Number.isFinite,
         message: "Farm size must be a valid number",
@@ -26,27 +73,16 @@ const farmerSchema = new Schema(
     },
     location: {
       type: {
-        type: String, // 'Point' for GeoJSON
-        enum: ["Point"], // Only allow 'Point'
+        type: String,
+        enum: ["Point"],
         default: "Point",
       },
       coordinates: {
-        type: [Number], // [longitude, latitude] per GeoJSON standard
+        type: [Number], // [longitude, latitude]
         required: [true, "Location coordinates are required"],
       },
     },
-    products: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "Product",
-        validate: {
-          validator: function (v) {
-            return v != null; // Ensure valid ObjectId
-          },
-          message: "Invalid product reference",
-        },
-      },
-    ],
+    products: [productSchema], // Embedded product schema
     certifications: {
       type: [String],
       default: [],
@@ -58,24 +94,15 @@ const farmerSchema = new Schema(
     },
   },
   {
-    timestamps: true, // Add createdAt and updatedAt fields
-    toJSON: { virtuals: true }, // Include virtuals in JSON output
+    timestamps: true,
+    toJSON: { virtuals: true },
     toObject: { virtuals: true },
   }
 );
 
-// Index for geospatial queries on location
+// Indexes
 farmerSchema.index({ location: "2dsphere" });
-
-// Index for faster lookups by user
 farmerSchema.index({ user: 1 });
-
-// Corrected virtual with foreignField
-farmerSchema.virtual("productDetails", {
-  ref: "Product",
-  localField: "products",
-  foreignField: "_id", // Added this to specify the field in Product to match
-});
 
 const Farmer = model("Farmer", farmerSchema);
 export default Farmer;
