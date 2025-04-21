@@ -628,3 +628,79 @@ export const getAllUsers = async (req, res, next) => {
     next(new AppError(error.message || "Failed to fetch users", 400));
   }
 };
+
+export const editProduct = async (req, res, next) => {
+  try {
+    console.log("editProduct - req.user:", req.user);
+    const userId = req.user?.id;
+    if (!userId) {
+      return next(
+        new AppError("Authentication required: No user ID found", 401)
+      );
+    }
+
+    const user = await UserData.findById(userId).select("role");
+    if (!user || user.role !== "FARMER") {
+      return next(new AppError("Only farmers can edit products", 403));
+    }
+
+    const { productId } = req.params;
+    const { name, price, quantity, category, description, img } = req.body;
+
+    if (!productId) {
+      return next(new AppError("Product ID is required", 400));
+    }
+
+    const farmer = await Farmer.findOne({ user: userId });
+    if (!farmer) {
+      return next(new AppError("Farmer profile not found", 404));
+    }
+
+    const product = farmer.products.id(productId);
+    if (!product) {
+      return next(new AppError("Product not found", 404));
+    }
+
+    // Update fields only if provided
+    if (name) product.name = name;
+    if (price) {
+      const parsedPrice = parseFloat(price);
+      if (isNaN(parsedPrice) || parsedPrice <= 0) {
+        return next(new AppError("Price must be a positive number", 400));
+      }
+      product.price = parsedPrice;
+    }
+    if (quantity) {
+      const parsedQuantity = parseFloat(quantity);
+      if (isNaN(parsedQuantity) || parsedQuantity < 0) {
+        return next(
+          new AppError("Quantity must be a non-negative number", 400)
+        );
+      }
+      product.quantity = parsedQuantity;
+    }
+    if (category) {
+      if (!["fruits", "grains", "vegetables"].includes(category)) {
+        return next(new AppError("Invalid category", 400));
+      }
+      product.category = category;
+    }
+    if (description) product.description = description;
+    if (img && img.secure_url && img.public_id) {
+      product.img = {
+        secure_url: img.secure_url,
+        public_id: img.public_id,
+      };
+    }
+
+    await farmer.save();
+
+    res.status(200).json({
+      status: "success",
+      data: { product },
+    });
+  } catch (error) {
+    console.error("editProduct error:", error);
+    next(new AppError(error.message || "Failed to update product", 400));
+  }
+};

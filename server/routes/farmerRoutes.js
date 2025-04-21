@@ -11,6 +11,7 @@ import {
   getAllFarmerProducts,
   createAdminOrder,
   getAllUsers,
+  editProduct,
 } from "../controllers/farmerController.js";
 import { isLoggedIn, authorizeRoles } from "../middlewares/authMiddleware.js";
 import upload from "../middlewares/multer.js";
@@ -40,5 +41,6 @@ router.post(
   createAdminOrder
 );
 router.get("/users", isLoggedIn, getAllUsers);
+router.patch("/products/:productId", editProduct);
 
 export default router;

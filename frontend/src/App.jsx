@@ -17,6 +17,7 @@ import AccessDenied from "./Pages/AccessDenied";
 import RequireAuth from "./components/RequireAuth";
 import AdminUserManagement from "./Pages/Admin/AdminUserManagement";
 import RequestResetPasswordPage from "./Pages/User/RequestResetPasswordPage";
+import EditProduct from "./components/Farmer/EditProduct";
 import ResetPasswordPage from "./Pages/User/ResetPasswordPage";
 import PreviousOrder from "./Pages/Cart/PreviousOrder";
 import AnalyticsPage from "./Pages/Admin/AnalyticsPage";
@@ -89,6 +90,10 @@ function App() {
           <Route
             path="/farmer/update-profile"
             element={<UpdateProfileFarmer />}
+          />
+          <Route
+            path="/farmer/products/edit/:productId"
+            element={<EditProduct/>}
           />
           <Route path="/farmer/update-stock" element={<UpdateStock />} />
         </Route>

@@ -123,6 +123,27 @@ export const getOrdersReceived = createAsyncThunk(
   }
 );
 
+export const editProduct = createAsyncThunk(
+  "farmer/editProduct",
+  async ({ productId, productData }, { rejectWithValue }) => {
+    try {
+      const response = await axios.patch(
+        `/api/farmer/products/${productId}`,
+        productData,
+        {
+          withCredentials: true,
+        }
+      );
+      return response.data.data.product;
+    } catch (error) {
+      console.error("editProduct error:", error.response?.data);
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to update product"
+      );
+    }
+  }
+);
+
 // Update order delivery status
 export const updateOrderDeliveryStatus = createAsyncThunk(
   "farmer/updateOrderDeliveryStatus",
@@ -367,6 +388,26 @@ const farmerSlice = createSlice({
         state.users = action.payload;
       })
       .addCase(getAllUsers.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(editProduct.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(editProduct.fulfilled, (state, action) => {
+        state.loading = false;
+        const updatedProduct = action.payload;
+        const index = state.allProducts.findIndex(
+          (p) => p._id === updatedProduct._id
+        );
+        if (index !== -1) {
+          state.allProducts[index] = updatedProduct;
+        } else {
+          state.allProducts.push(updatedProduct);
+        }
+      })
+      .addCase(editProduct.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });
