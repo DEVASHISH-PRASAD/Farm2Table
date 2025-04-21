@@ -101,9 +101,7 @@ const FarmerProducts = () => {
                       </td>
                       <td className="py-2 px-4 border-b">
                         <button
-                          onClick={() =>
-                            navigate(`/farmer/products/edit/${product._id}`)
-                          }
+                          onClick={() => navigate(`/farmer/editProduct`)}
                           className="px-3 py-1 bg-[#004526] text-white rounded-lg hover:bg-[#004540] flex items-center"
                         >
                           <FaEdit className="mr-1" /> Edit
