@@ -15,7 +15,9 @@ const generateOrderId = () => {
 // Add a new product (unchanged)
 export const addProduct = async (req, res, next) => {
   try {
-    const userId = req.user?._id;
+    const userId = req.user._id;
+    console.log(userId);
+    
     if (!userId) {
       return next(new AppError("Authentication required or invalid user", 401));
     }
