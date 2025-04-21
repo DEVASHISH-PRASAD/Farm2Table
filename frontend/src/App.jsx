@@ -93,7 +93,7 @@ function App() {
             element={<UpdateProfileFarmer />}
           />
           <Route
-            path="/farmer/products/edit/:productId"
+            path="/edit-product/:productId"
             element={<EditProduct />}
           />
           <Route path="/farmer/products" element={<FarmerProducts/>} />
