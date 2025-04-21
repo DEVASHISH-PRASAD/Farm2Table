@@ -20,7 +20,7 @@ import RequestResetPasswordPage from "./Pages/User/RequestResetPasswordPage";
 import ResetPasswordPage from "./Pages/User/ResetPasswordPage";
 import PreviousOrder from "./Pages/Cart/PreviousOrder";
 import AnalyticsPage from "./Pages/Admin/AnalyticsPage";
-import AdminBuyProducts from "./components/Admin/AdminBuyProducts"; // New import
+import AdminBuyProducts from "./Pages/Admin/AdminBuyProducts"; // New import
 import Page404 from "./Pages/Page404";
 // Farmer Pages
 import AddProduct from "./components/Farmer/AddProduct";
