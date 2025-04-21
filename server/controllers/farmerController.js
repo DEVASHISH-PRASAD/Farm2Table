@@ -15,7 +15,7 @@ const generateOrderId = () => {
 // Add a new product (unchanged)
 export const addProduct = async (req, res, next) => {
   try {
-    const userId = req.user?.id;
+    const userId = req.user?._id;
     if (!userId) {
       return next(new AppError("Authentication required or invalid user", 401));
     }
@@ -114,7 +114,7 @@ export const addProduct = async (req, res, next) => {
 // Delete a product (unchanged)
 export const deleteProduct = async (req, res, next) => {
   try {
-    const userId = req.user?.id;
+    const userId = req.user?._id;
     const productId = req.params.productId;
 
     if (!userId) {
@@ -140,6 +140,7 @@ export const deleteProduct = async (req, res, next) => {
       "items.name": product.name,
       status: "Pending",
       deliveryStatus: "Not Dispatched",
+
     });
 
     if (activeOrders.length > 0) {
@@ -174,7 +175,7 @@ export const deleteProduct = async (req, res, next) => {
 // Update farmer profile (unchanged)
 export const updateProfile = async (req, res, next) => {
   try {
-    const userId = req.user?.id;
+    const userId = req.user?._id;
     if (!userId) {
       return next(new AppError("Authentication required or invalid user", 401));
     }
@@ -259,7 +260,7 @@ export const updateProfile = async (req, res, next) => {
 // Get farmer profile (unchanged)
 export const getFarmerProfile = async (req, res, next) => {
   try {
-    const userId = req.user?.id;
+    const userId = req.user?._id;
     if (!userId) {
       return next(new AppError("Authentication required or invalid user", 401));
     }
@@ -286,7 +287,7 @@ export const getFarmerProfile = async (req, res, next) => {
 // Update product stock (unchanged)
 export const updateStock = async (req, res, next) => {
   try {
-    const userId = req.user?.id;
+    const userId = req.user?._id;
     const { productId, stock } = req.body;
 
     if (!userId) {
@@ -334,7 +335,7 @@ export const updateStock = async (req, res, next) => {
 // Get orders received (unchanged)
 export const getOrdersReceived = async (req, res, next) => {
   try {
-    const userId = req.user?.id;
+    const userId = req.user?._id;
     if (!userId) {
       return next(new AppError("Authentication required or invalid user", 401));
     }
@@ -369,7 +370,7 @@ export const getOrdersReceived = async (req, res, next) => {
 // Update order delivery status (unchanged)
 export const updateOrderDeliveryStatus = async (req, res, next) => {
   try {
-    const userId = req.user?.id;
+    const userId = req.user?._id;
     const { orderId, deliveryStatus } = req.body;
 
     if (!userId) {
@@ -442,7 +443,7 @@ export const updateOrderDeliveryStatus = async (req, res, next) => {
 // Get farmer's products (unchanged)
 export const getMyProducts = async (req, res, next) => {
   try {
-    const userId = req.user?.id;
+    const userId = req.user?._id;
     if (!userId) {
       return next(new AppError("Authentication required or invalid user", 401));
     }
@@ -469,7 +470,7 @@ export const getMyProducts = async (req, res, next) => {
 // Get all farmer products (for admin)
 export const getAllFarmerProducts = async (req, res, next) => {
   try {
-    const userId = req.user?.id;
+    const userId = req.user?._id;
     if (!userId) {
       return next(new AppError("Authentication required or invalid user", 401));
     }
@@ -507,7 +508,7 @@ export const getAllFarmerProducts = async (req, res, next) => {
 // Create admin order
 export const createAdminOrder = async (req, res, next) => {
   try {
-    const userId = req.user?.id;
+    const userId = req.user?._id;
     if (!userId) {
       return next(new AppError("Authentication required or invalid user", 401));
     }
@@ -602,7 +603,7 @@ export const createAdminOrder = async (req, res, next) => {
 // Get all users (for admin order form)
 export const getAllUsers = async (req, res, next) => {
   try {
-    const userId = req.user?.id;
+    const userId = req.user?._id;
     if (!userId) {
       return next(new AppError("Authentication required or invalid user", 401));
     }

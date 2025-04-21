@@ -18,8 +18,8 @@ import upload from "../middlewares/multer.js";
 const router = express.Router();
 
 
-router.get("/profile", authorizeRoles("FARMER"), getFarmerProfile);
-router.patch("/profile", authorizeRoles("FARMER"), updateProfile);
+router.get("/profile",  getFarmerProfile);
+router.patch("/profile",updateProfile);
 router.post(
   "/products/add",
   upload.single("image"),
