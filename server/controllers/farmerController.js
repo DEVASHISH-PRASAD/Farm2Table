@@ -4,6 +4,7 @@ import Order from "../models/orderModel.js";
 import AppError from "../utils/errorUtil.js";
 import cloudinary from "cloudinary";
 import fs from "fs/promises";
+import { log } from "util";
 
 // Generate unique orderId
 const generateOrderId = () => {
@@ -15,7 +16,8 @@ const generateOrderId = () => {
 // Add a new product (unchanged)
 export const addProduct = async (req, res, next) => {
   try {
-    const userId = req.user._id;
+    console.log(req.user)
+    const userId = req.user?.id;
     console.log(userId);
     
     if (!userId) {
