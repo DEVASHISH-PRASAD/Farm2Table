@@ -1,37 +1,33 @@
-// routes/farmerRoutes.js
 import express from "express";
 import {
   addProduct,
   updateStock,
   deleteProduct,
-  getOrdersReceived,
-  updateProfile,
-  getAllFarmerProducts,
-  getFarmerProfile,
   getMyProducts,
+  getOrdersReceived,
   updateOrderDeliveryStatus,
-  updateProduct,
+  updateProfile,
+  getFarmerProfile,
+  getAllFarmerProducts,
   createAdminOrder,
   getAllUsers,
 } from "../controllers/farmerController.js";
-import { isLoggedIn,authorizeRoles } from "../middlewares/authMiddleware.js";
+import { isLoggedIn, authorizeRoles } from "../middleware/authMiddleware.js";
+import upload from "../middleware/multer.js";
 
 const router = express.Router();
 
-// Farmer routes
+
 router.get("/profile", authorizeRoles("FARMER"), getFarmerProfile);
-router.post("/products/add", isLoggedIn,upload.single("image"), addProduct);
-router.patch("/products/update-stock", isLoggedIn, updateStock);
-router.delete("/products/:productId", isLoggedIn, deleteProduct);
-router.get("/products/my-products", authorizeRoles("FARMER"), getMyProducts);
-router.get("/orders", isLoggedIn, getOrdersReceived);
-router.patch("/profile", isLoggedIn, updateProfile);
-router.patch(
-  "/products/update",
+router.patch("/profile", authorizeRoles("FARMER"), updateProfile);
+router.post(
+  "/products/add",
   authorizeRoles("FARMER"),
   upload.single("image"),
-  updateProduct
+  addProduct
 );
+router.patch("/products/update-stock", authorizeRoles("FARMER"), updateStock);
+router.delete("/products/:productId", authorizeRoles("FARMER"), deleteProduct);
 router.get("/products/my-products", authorizeRoles("FARMER"), getMyProducts);
 router.get("/orders", authorizeRoles("FARMER"), getOrdersReceived);
 router.patch(
@@ -39,8 +35,6 @@ router.patch(
   authorizeRoles("FARMER"),
   updateOrderDeliveryStatus
 );
-
-// Admin route
 router.get("/products/all", authorizeRoles("ADMIN"), getAllFarmerProducts);
 router.post("/orders/admin", authorizeRoles("ADMIN"), createAdminOrder);
 router.get("/users", authorizeRoles("ADMIN"), getAllUsers);
