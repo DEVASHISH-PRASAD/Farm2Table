@@ -12,8 +12,8 @@ import {
   createAdminOrder,
   getAllUsers,
 } from "../controllers/farmerController.js";
-import { isLoggedIn, authorizeRoles } from "../middleware/authMiddleware.js";
-import upload from "../middleware/multer.js";
+import { isLoggedIn, authorizeRoles } from "../middlewares/authMiddleware.js";
+import upload from "../middlewares/multer.js";
 
 const router = express.Router();
 
