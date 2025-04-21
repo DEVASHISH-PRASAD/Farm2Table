@@ -26,13 +26,12 @@ router.post(
   upload.single("image"),
   addProduct
 );
-router.patch("/products/update-stock", authorizeRoles("FARMER"), updateStock);
-router.delete("/products/:productId", authorizeRoles("FARMER"), deleteProduct);
-router.get("/products/my-products", authorizeRoles("FARMER"), getMyProducts);
-router.get("/orders", authorizeRoles("FARMER"), getOrdersReceived);
+router.patch("/products/update-stock", updateStock);
+router.delete("/products/:productId", deleteProduct);
+router.get("/products/my-products", getMyProducts);
+router.get("/orders", getOrdersReceived);
 router.patch(
   "/orders/delivery-status",
-  authorizeRoles("FARMER"),
   updateOrderDeliveryStatus
 );
 router.get("/products/all", authorizeRoles("ADMIN"), getAllFarmerProducts);
