@@ -18,23 +18,29 @@ import upload from "../middlewares/multer.js";
 const router = express.Router();
 
 
-router.get("/profile",  getFarmerProfile);
-router.patch("/profile",updateProfile);
-router.post(
-  "/products/add",
-  upload.single("image"),
-  addProduct
-);
-router.patch("/products/update-stock", updateStock);
-router.delete("/products/:productId", deleteProduct);
-router.get("/products/my-products", getMyProducts);
-router.get("/orders", getOrdersReceived);
+router.get("/profile", isLoggedIn, getFarmerProfile);
+router.patch("/profile", isLoggedIn, updateProfile);
+router.post("/products/add", isLoggedIn, upload.single("image"), addProduct);
+router.patch("/products/update-stock", isLoggedIn, updateStock);
+router.delete("/products/:productId", isLoggedIn, deleteProduct);
+router.get("/products/my-products", isLoggedIn, getMyProducts);
+router.get("/orders", isLoggedIn, getOrdersReceived);
 router.patch(
   "/orders/delivery-status",
   updateOrderDeliveryStatus
 );
-router.get("/products/all", authorizeRoles("ADMIN"), getAllFarmerProducts);
-router.post("/orders/admin", authorizeRoles("ADMIN"), createAdminOrder);
-router.get("/users", authorizeRoles("ADMIN"), getAllUsers);
+router.get(
+  "/products/all",
+  isLoggedIn,
+  authorizeRoles("ADMIN"),
+  getAllFarmerProducts
+);
+router.post(
+  "/orders/admin",
+  isLoggedIn,
+  authorizeRoles("ADMIN"),
+  createAdminOrder
+);
+router.get("/users", isLoggedIn, authorizeRoles("ADMIN"), getAllUsers);
 
 export default router;

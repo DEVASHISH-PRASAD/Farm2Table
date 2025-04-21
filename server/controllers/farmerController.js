@@ -4,7 +4,6 @@ import Order from "../models/orderModel.js";
 import AppError from "../utils/errorUtil.js";
 import cloudinary from "cloudinary";
 import fs from "fs/promises";
-import { log } from "util";
 
 // Generate unique orderId
 const generateOrderId = () => {
