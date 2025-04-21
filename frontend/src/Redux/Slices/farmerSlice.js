@@ -6,7 +6,7 @@ export const getFarmerProfile = createAsyncThunk(
   "farmer/getFarmerProfile",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get("/profile", {
+      const response = await axios.get("/farmer/profile", {
         withCredentials: true,
       });
       return response.data.data.farmer;
@@ -23,7 +23,7 @@ export const updateProfileFarmer = createAsyncThunk(
   "farmer/updateProfile",
   async (profileData, { rejectWithValue }) => {
     try {
-      const response = await axios.patch("/profile", profileData, {
+      const response = await axios.patch("/farmer/profile", profileData, {
         withCredentials: true,
       });
       return response.data.data.farmer;
@@ -40,7 +40,7 @@ export const addProduct = createAsyncThunk(
   "farmer/addProduct",
   async (formData, { rejectWithValue }) => {
     try {
-      const response = await axios.post("/products/add", formData, {
+      const response = await axios.post("/farmer/products/add", formData, {
         withCredentials: true,
         headers: { "Content-Type": "multipart/form-data" },
       });
@@ -58,7 +58,7 @@ export const deleteProduct = createAsyncThunk(
   "farmer/deleteProduct",
   async (productId, { rejectWithValue }) => {
     try {
-      await axios.delete(`/products/${productId}`, {
+      await axios.delete(`/farmer/products/${productId}`, {
         withCredentials: true,
       });
       return productId;
@@ -72,7 +72,7 @@ export const deleteProduct = createAsyncThunk(
 
 // Get farmer's products
 export const getFarmerProducts = createAsyncThunk(
-  "farmer/getFarmerProducts",
+  "/farmer/getFarmerProducts",
   async (_, { rejectWithValue }) => {
     try {
       const response = await axios.get("/products/my-products", {
@@ -93,7 +93,7 @@ export const updateStock = createAsyncThunk(
   async ({ productId, stock }, { rejectWithValue }) => {
     try {
       const response = await axios.patch(
-        "/products/update-stock",
+        "/farmer/products/update-stock",
         { productId, stock },
         { withCredentials: true }
       );
@@ -111,7 +111,7 @@ export const getOrdersReceived = createAsyncThunk(
   "farmer/getOrdersReceived",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get("/orders", {
+      const response = await axios.get("/farmer/orders", {
         withCredentials: true,
       });
       return response.data.data.orders;
@@ -129,7 +129,7 @@ export const updateOrderDeliveryStatus = createAsyncThunk(
   async ({ orderId, deliveryStatus }, { rejectWithValue }) => {
     try {
       const response = await axios.patch(
-        "/orders/delivery-status",
+        "/farmer/orders/delivery-status",
         { orderId, deliveryStatus },
         { withCredentials: true }
       );
@@ -147,7 +147,7 @@ export const getAllFarmerProducts = createAsyncThunk(
   "farmer/getAllFarmerProducts",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get("/products/all", {
+      const response = await axios.get("/farmer/products/all", {
         withCredentials: true,
       });
       return response.data.data.products;
@@ -164,7 +164,7 @@ export const createAdminOrder = createAsyncThunk(
   "farmer/createAdminOrder",
   async (orderData, { rejectWithValue }) => {
     try {
-      const response = await axios.post("/orders/admin", orderData, {
+      const response = await axios.post("/farmer/orders/admin", orderData, {
         withCredentials: true,
       });
       return response.data.data.order;
@@ -181,7 +181,7 @@ export const getAllUsers = createAsyncThunk(
   "farmer/getAllUsers",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get("/users", {
+      const response = await axios.get("/farmer/users", {
         withCredentials: true,
       });
       return response.data.data.users;
