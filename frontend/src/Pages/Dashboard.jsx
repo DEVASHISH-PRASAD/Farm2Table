@@ -15,20 +15,6 @@ const Dashboard = () => {
 
   function handleLogout() {
     dispatch(logout())
-      .unwrap()
-      .then(() => {
-        toast.success("Logged out successfully", {
-          duration: 3000,
-          position: "top-right",
-        });
-        navigate("/login");
-      })
-      .catch((err) => {
-        toast.error(err || "Logout failed", {
-          duration: 3000,
-          position: "top-right",
-        });
-      });
   }
 
   useEffect(() => {

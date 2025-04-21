@@ -32,15 +32,13 @@ router.patch(
 router.get(
   "/products/all",
   isLoggedIn,
-  authorizeRoles("ADMIN"),
   getAllFarmerProducts
 );
 router.post(
   "/orders/admin",
   isLoggedIn,
-  authorizeRoles("ADMIN"),
   createAdminOrder
 );
-router.get("/users", isLoggedIn, authorizeRoles("ADMIN"), getAllUsers);
+router.get("/users", isLoggedIn, getAllUsers);
 
 export default router;
