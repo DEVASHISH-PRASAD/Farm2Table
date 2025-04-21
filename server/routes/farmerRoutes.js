@@ -15,7 +15,7 @@ import {
   createAdminOrder,
   getAllUsers,
 } from "../controllers/farmerController.js";
-import { isLoggedIn,authorizeRoles } from "../middleware/authMiddleware.js";
+import { isLoggedIn,authorizeRoles } from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 
