@@ -27,7 +27,7 @@ router.delete("/products/:productId", isLoggedIn, deleteProduct);
 router.get("/products/my-products", isLoggedIn, getMyProducts);
 router.get("/orders", isLoggedIn, getOrdersReceived);
 router.patch(
-  "/orders/delivery-status",
+  "/orders/delivery-status",isLoggedIn,
   updateOrderDeliveryStatus
 );
 router.get(
