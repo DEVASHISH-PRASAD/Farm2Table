@@ -124,7 +124,7 @@ export const getOrdersReceived = createAsyncThunk(
 );
 
 export const editProduct = createAsyncThunk(
-  "farmer/editProduct",
+  "/farmer/editProduct",
   async ({ productId, productData }, { rejectWithValue }) => {
     try {
       const response = await axios.patch(

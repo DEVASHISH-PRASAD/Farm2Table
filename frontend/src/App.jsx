@@ -92,12 +92,9 @@ function App() {
             path="/farmer/update-profile"
             element={<UpdateProfileFarmer />}
           />
-          <Route
-            path="/edit-product/:productId"
-            element={<EditProduct />}
-          />
-          <Route path="/farmer/products" element={<FarmerProducts/>} />
-          
+          <Route path="/farmer/editProduct" element={<EditProduct />} />
+          <Route path="/farmer/products" element={<FarmerProducts />} />
+
           <Route path="/farmer/update-stock" element={<UpdateStock />} />
         </Route>
 
