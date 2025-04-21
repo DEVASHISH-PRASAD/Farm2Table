@@ -34,6 +34,7 @@ import PurchaseProduct from "./components/wholesaler/PurchaseProduct";
 import ViewOrderHistory from "./components/wholesaler/ViewOrderHistory";
 import ViewAvailableProducts from "./components/wholesaler/ViewAvailableProducts";
 import UpdateProfileWholesaler from "./components/wholesaler/UpdateProfileWholesaler";
+import FarmerProducts from "./components/Farmer/FarmerProducts";
 
 function App() {
   return (
@@ -93,8 +94,10 @@ function App() {
           />
           <Route
             path="/farmer/products/edit/:productId"
-            element={<EditProduct/>}
+            element={<EditProduct />}
           />
+          <Route path="/farmer/products" element={<FarmerProducts/>} />
+          
           <Route path="/farmer/update-stock" element={<UpdateStock />} />
         </Route>
 

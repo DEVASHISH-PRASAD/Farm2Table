@@ -128,7 +128,7 @@ export const editProduct = createAsyncThunk(
   async ({ productId, productData }, { rejectWithValue }) => {
     try {
       const response = await axios.patch(
-        `/api/farmer/products/${productId}`,
+        `/farmer/products/${productId}`,
         productData,
         {
           withCredentials: true,
