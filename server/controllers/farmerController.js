@@ -2,7 +2,7 @@ import Farmer from "../models/farmerModel.js";
 import UserData from "../models/userModel.js";
 import Order from "../models/orderModel.js";
 import AppError from "../utils/errorUtil.js";
-import cloudinary from "../config/cloudinary.js";
+import cloudinary from "cloudinary";
 import fs from "fs/promises";
 
 // Generate unique orderId
