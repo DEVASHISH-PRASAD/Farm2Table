@@ -22,7 +22,6 @@ router.get("/profile", authorizeRoles("FARMER"), getFarmerProfile);
 router.patch("/profile", authorizeRoles("FARMER"), updateProfile);
 router.post(
   "/products/add",
-  authorizeRoles("FARMER"),
   upload.single("image"),
   addProduct
 );
