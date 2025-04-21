@@ -4,7 +4,6 @@ import {
   addProduct,
   updateStock,
   deleteProduct,
-  getFarmerProducts,
   getOrdersReceived,
   updateProfile,
   getAllFarmerProducts,
@@ -24,8 +23,7 @@ router.get("/profile", authorizeRoles("FARMER"), getFarmerProfile);
 router.post("/products/add", isLoggedIn,upload.single("image"), addProduct);
 router.patch("/products/update-stock", isLoggedIn, updateStock);
 router.delete("/products/:productId", isLoggedIn, deleteProduct);
-router.get("/products/my-products", restrictTo("FARMER"), getMyProducts);
-router.get("/products/my-products", isLoggedIn, getFarmerProducts);
+router.get("/products/my-products", authorizeRoles("FARMER"), getMyProducts);
 router.get("/orders", isLoggedIn, getOrdersReceived);
 router.patch("/profile", isLoggedIn, updateProfile);
 router.patch(
