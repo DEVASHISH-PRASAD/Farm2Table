@@ -75,7 +75,7 @@ export const getFarmerProducts = createAsyncThunk(
   "/farmer/getFarmerProducts",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get("/products/my-products", {
+      const response = await axios.get("/farmer/products/my-products", {
         withCredentials: true,
       });
       return response.data.data.products;
