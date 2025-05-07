@@ -210,14 +210,14 @@ const HomePage = () => {
                 <>
                   <a
                     href="/signup"
-                    className="block text-lg cursor-pointer text-white hover:text-gray-200 py-2 border-b border-gray-600 w-full text-center" // Added border
+                    className="block text-lg cursor-pointer text-white hover:text-gray-200 py-2 border-b border-gray-600 w-full text-center" 
                     onClick={() => setIsMenuOpen(false)}
                   >
                     Signup
                   </a>
                   <a
                     href="/login"
-                    className="block text-lg text-white hover:text-gray-200 py-2 border-b border-gray-600 w-full text-center" // Added border
+                    className="block text-lg text-white hover:text-gray-200 py-2 border-b border-gray-600 w-full text-center" 
                     onClick={() => setIsMenuOpen(false)}
                   >
                     Login

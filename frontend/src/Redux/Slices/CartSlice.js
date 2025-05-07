@@ -47,6 +47,26 @@ export const getPreviousOrders = createAsyncThunk(
   }
 );
 
+export const fetchCartItems = createAsyncThunk(
+  "cart/fetchCartItems",
+  async (userId, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(`/cart/${userId}`);
+      const backendItems = response.data.items || [];
+      // Sync with localStorage
+      const localItems = JSON.parse(localStorage.getItem("cartItems")) || [];
+      const mergedItems = [...backendItems, ...localItems.filter(
+        (localItem) => !backendItems.some((backendItem) => backendItem.name === localItem.name)
+      )];
+      localStorage.setItem("cartItems", JSON.stringify(mergedItems));
+      return mergedItems;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || "Failed to fetch cart");
+    }
+  }
+);
+
+
 const CartSlice = createSlice({
   name: "cart",
   initialState: {
@@ -127,7 +147,18 @@ const CartSlice = createSlice({
       .addCase(getPreviousOrders.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
-      });
+      }).addCase(fetchCartItems.pending, (state) => {
+      state.loading = true;
+      state.error = null;
+    })
+    .addCase(fetchCartItems.fulfilled, (state, action) => {
+      state.loading = false;
+      state.items = action.payload;
+    })
+    .addCase(fetchCartItems.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    });
   },
 });
 

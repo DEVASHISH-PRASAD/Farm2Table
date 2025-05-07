@@ -7,6 +7,7 @@ import {
   clearCart,
   createOrder,
   verifyPayment,
+  getPreviousOrders, // Added to fetch previous orders
 } from "../Redux/Slices/CartSlice";
 import toast from "react-hot-toast";
 import { updateStockAfterPurchase } from "../Redux/Slices/ProductSlice";
@@ -18,11 +19,13 @@ const CartPage = () => {
     error,
     paymentLoading,
     paymentError,
+    previousOrders, // Added to access previous orders
   } = useSelector((state) => state.cart);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const userData = useSelector((state) => state?.auth?.data);
 
+  // Load Razorpay script
   useEffect(() => {
     const script = document.createElement("script");
     script.src = "https://checkout.razorpay.com/v1/checkout.js";
@@ -33,10 +36,18 @@ const CartPage = () => {
     };
   }, []);
 
+  // Fetch previous orders on mount (optional, if you want to display them)
+  useEffect(() => {
+    if (userData?._id) {
+      dispatch(getPreviousOrders(userData._id));
+    }
+  }, [dispatch, userData]);
+
   // Debug log to check if cartItems updates
   useEffect(() => {
     console.log("Cart items updated:", cartItems);
-  }, [cartItems]);
+    console.log("Previous orders:", previousOrders);
+  }, [cartItems, previousOrders]);
 
   const calculateTotalCost = () => {
     return cartItems.reduce(
@@ -218,6 +229,40 @@ const CartPage = () => {
             </div>
           )}
         </section>
+
+        {/* Optional: Display Previous Orders */}
+        {previousOrders && previousOrders.length > 0 && (
+          <section className="mt-12">
+            <h2 className="text-2xl font-bold mb-4">Previous Orders</h2>
+            {loading ? (
+              <p>Loading previous orders...</p>
+            ) : error ? (
+              <p className="text-red-500">{error}</p>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                {previousOrders.map((order, index) => (
+                  <div
+                    key={index}
+                    className="bg-white shadow-lg p-4 rounded-lg"
+                  >
+                    <p className="text-sm text-gray-700">
+                      Order ID: {order.orderId}
+                    </p>
+                    <p className="text-sm text-gray-700">
+                      Total Amount: ₹{order.totalAmount}
+                    </p>
+                    <p className="text-sm text-gray-700">
+                      Status: {order.status}
+                    </p>
+                    <p className="text-sm text-gray-700">
+                      Ordered On: {new Date(order.createdAt).toLocaleDateString()}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </section>
+        )}
       </main>
     </div>
   );
