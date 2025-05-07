@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
-import { updateProduct } from "../../Redux/Slices/farmerSlice";
 import toast from "react-hot-toast";
 import Header from "../../Pages/Header";
 import Footer from "../../Pages/Footer";
@@ -54,19 +53,7 @@ const EditProduct = () => {
     if (formData.image) data.append("image", formData.image);
     data.append("productId", productId);
 
-    try {
-      await dispatch(updateProduct(data)).unwrap();
-      toast.success("Product updated successfully!", {
-        duration: 3000,
-        position: "top-right",
-      });
-      navigate("/view-products");
-    } catch (err) {
-      toast.error(err || "Failed to update product", {
-        duration: 3000,
-        position: "top-right",
-      });
-    }
+ 
   };
 
   return (
