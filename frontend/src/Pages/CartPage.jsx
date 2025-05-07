@@ -2,12 +2,13 @@ import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import {
+  fetchCartItems,
   removeItem,
   updateItemQuantity,
   clearCart,
   createOrder,
   verifyPayment,
-  getPreviousOrders, // Added to fetch previous orders
+  getPreviousOrders,
 } from "../Redux/Slices/CartSlice";
 import toast from "react-hot-toast";
 import { updateStockAfterPurchase } from "../Redux/Slices/ProductSlice";
@@ -19,7 +20,7 @@ const CartPage = () => {
     error,
     paymentLoading,
     paymentError,
-    previousOrders, // Added to access previous orders
+    previousOrders,
   } = useSelector((state) => state.cart);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -36,8 +37,9 @@ const CartPage = () => {
     };
   }, []);
 
-  // Fetch previous orders on mount (optional, if you want to display them)
+  // Fetch cart items and previous orders on mount
   useEffect(() => {
+    dispatch(fetchCartItems());
     if (userData?._id) {
       dispatch(getPreviousOrders(userData._id));
     }
@@ -230,7 +232,6 @@ const CartPage = () => {
           )}
         </section>
 
-        {/* Optional: Display Previous Orders */}
         {previousOrders && previousOrders.length > 0 && (
           <section className="mt-12">
             <h2 className="text-2xl font-bold mb-4">Previous Orders</h2>

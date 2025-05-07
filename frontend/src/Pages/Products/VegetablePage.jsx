@@ -3,7 +3,12 @@ import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { IoCartOutline } from "react-icons/io5";
 import AOS from "aos";
-import { getAllItems, updateProductQuantity, updateProductPrice } from "../../Redux/Slices/ProductSlice";
+import {
+  getAllItems,
+  updateProductQuantity,
+  updateProductPrice,
+} from "../../Redux/Slices/ProductSlice";
+import { addItem } from "../../Redux/Slices/CartSlice"; // Import addItem
 import Footer from "../Footer";
 import toast from "react-hot-toast";
 
@@ -13,12 +18,13 @@ const VegetablesPage = () => {
   const [errors, setErrors] = useState({});
   const [category, setCategory] = useState("vegetables");
   const [searchTerm, setSearchTerm] = useState("");
-  const [updatedQuantities, setUpdatedQuantities] = useState({}); 
-  const [updatedPrices, setUpdatedPrices] = useState({}); // To keep track of updated prices
+  const [updatedQuantities, setUpdatedQuantities] = useState({});
+  const [updatedPrices, setUpdatedPrices] = useState({});
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const items = useSelector((state) => state.products.items);
+  const cartItems = useSelector((state) => state.cart.items); // Access cart items from Redux
   const loading = useSelector((state) => state.products.loading);
   const error = useSelector((state) => state.products.error);
   const userData = useSelector((state) => state.auth.data);
@@ -30,20 +36,16 @@ const VegetablesPage = () => {
       mirror: false,
     });
 
-    const updateCartCount = () => {
-      const cartItems = JSON.parse(localStorage.getItem("cartItems")) || [];
-      const totalCount = cartItems.reduce(
-        (sum, item) => sum + (item.weight > 0 ? 1 : 0),
-        0
-      );
-      setCartCount(totalCount);
-    };
+    const totalCount = cartItems.reduce(
+      (sum, item) => sum + (item.weight > 0 ? 1 : 0),
+      0
+    );
+    setCartCount(totalCount);
 
-    updateCartCount();
     dispatch(getAllItems(category)).catch(() => {
       toast.error("Failed to fetch items. Please try again.");
     });
-  }, [category, dispatch]);
+  }, [category, dispatch, cartItems]);
 
   const handleRoleChange = (e) => {
     const newCategory = e.target.value;
@@ -77,29 +79,16 @@ const VegetablesPage = () => {
       return;
     }
 
-    const currentCart = JSON.parse(localStorage.getItem("cartItems")) || [];
-    const itemIndex = currentCart.findIndex((item) => item.name === name);
     const price = items.find((item) => item.name === name).price;
+    const item = {
+      name,
+      weight,
+      price,
+      totalCost: weight * price,
+    };
 
-    if (itemIndex > -1) {
-      currentCart[itemIndex].weight = weight;
-      currentCart[itemIndex].totalCost = weight * price;
-    } else {
-      currentCart.push({
-        name,
-        weight,
-        price,
-        totalCost: weight * price,
-      });
-    }
+    dispatch(addItem(item));
 
-    localStorage.setItem("cartItems", JSON.stringify(currentCart));
-    const updatedCartItems = JSON.parse(localStorage.getItem("cartItems")) || [];
-    const totalCount = updatedCartItems.reduce(
-      (sum, item) => sum + (item.weight > 0 ? 1 : 0),
-      0
-    );
-    setCartCount(totalCount);
     setWeights((prevWeights) => ({
       ...prevWeights,
       [name]: "",
@@ -115,18 +104,19 @@ const VegetablesPage = () => {
 
     const confirmUpdate = window.confirm("Are you sure you want to update the quantity?");
     if (confirmUpdate) {
-      dispatch(updateProductQuantity({ id: productId, quantity })).then(() => {
-        setUpdatedQuantities((prev) => ({
-          ...prev,
-          [productId]: quantity,
-        }));
-      }).catch(() => {
-        toast.error("Failed to update product quantity.");
-      });
+      dispatch(updateProductQuantity({ id: productId, quantity }))
+        .then(() => {
+          setUpdatedQuantities((prev) => ({
+            ...prev,
+            [productId]: quantity,
+          }));
+        })
+        .catch(() => {
+          toast.error("Failed to update product quantity.");
+        });
     }
   };
 
-  // New method to handle price update
   const handleUpdatePrice = (productId, price) => {
     if (price <= 0 || isNaN(price)) {
       toast.error("Please enter a valid price.");
@@ -135,18 +125,19 @@ const VegetablesPage = () => {
 
     const confirmUpdate = window.confirm("Are you sure you want to update the price?");
     if (confirmUpdate) {
-      dispatch(updateProductPrice({ id: productId, price })).then(() => {
-        setUpdatedPrices((prev) => ({
-          ...prev,
-          [productId]: price,
-        }));
-      }).catch(() => {
-        toast.error("Failed to update product price.");
-      });
+      dispatch(updateProductPrice({ id: productId, price }))
+        .then(() => {
+          setUpdatedPrices((prev) => ({
+            ...prev,
+            [productId]: price,
+          }));
+        })
+        .catch(() => {
+          toast.error("Failed to update product price.");
+        });
     }
   };
 
-  // Filter items based on search term
   const filteredItems = items.filter((item) =>
     item.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
