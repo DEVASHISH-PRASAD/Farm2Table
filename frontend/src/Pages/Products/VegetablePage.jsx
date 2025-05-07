@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, memo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { IoCartOutline } from "react-icons/io5";
@@ -8,9 +8,111 @@ import {
   updateProductQuantity,
   updateProductPrice,
 } from "../../Redux/Slices/ProductSlice";
-import { addItem } from "../../Redux/Slices/CartSlice"; // Import addItem
+import { addItem } from "../../Redux/Slices/CartSlice";
 import Footer from "../Footer";
 import toast from "react-hot-toast";
+
+// Memoize the VegetableCard to prevent unnecessary re-renders
+const VegetableCard = memo(({ item, weights, errors, userData, updatedQuantities, updatedPrices, handleWeightChange, handleAddToCart, handleUpdateQuantity, handleUpdatePrice }) => {
+  return (
+    <div
+      className="card bg-white shadow-lg p-4 flex flex-col items-center"
+      data-aos="zoom-in"
+    >
+      <figure className="w-full mb-4">
+        <img
+          src={item.img.secure_url}
+          alt={item.name}
+          className="w-38 h-32 md:h-48 object-cover hover:scale-125 transition-all ease-in-out duration-300"
+        />
+      </figure>
+      <h3 className="text-lg font-semibold">{item.name}</h3>
+      <p className="text-sm text-gray-700 mt-2">
+        Price : ₹{item.price}/
+        {item.soldInPieces ? "piece" : item.soldInDozen ? "dozen" : "Kg"}
+      </p>
+
+      <div className="mt-4 flex items-center w-full">
+        <input
+          type="number"
+          min="1"
+          max="10"
+          step="0.5"
+          value={weights[item.name] || ""}
+          onChange={(e) => handleWeightChange(item.name, e.target.value)}
+          className="flex-1 p-2 border border-gray-300 rounded-l"
+        />
+        <span className="p-2 border border-l-0 border-gray-300 rounded-r">
+          {item.soldInPieces ? "piece" : item.soldInDozen ? "dozen" : "Kg"}
+        </span>
+      </div>
+      {errors[item.name] && (
+        <p className="text-red-500 text-sm mt-1">{errors[item.name]}</p>
+      )}
+
+      <button
+        onClick={() => handleAddToCart(item.name)}
+        className="mt-4 bg-[#ffdc00] text-black px-4 py-3 rounded-full hover:bg-[#ffd700] hover:scale-110 transition-all duration-200"
+      >
+        Add to Cart
+      </button>
+
+      {userData.role === "ADMIN" && (
+        <div className="mt-4 flex items-center w-full">
+          <input
+            type="number"
+            min="0"
+            max="1000"
+            step="1"
+            value={updatedQuantities[item._id] || item.quantity}
+            onChange={(e) =>
+              updatedQuantities((prev) => ({
+                ...prev,
+                [item._id]: e.target.value,
+              }))
+            }
+            placeholder="Update Qty"
+            className="flex-1 p-2 border border-gray-300 rounded-l"
+          />
+          <button
+            onClick={() =>
+              handleUpdateQuantity(item._id, updatedQuantities[item._id])
+            }
+            className="p-2 ml-2 bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-700 transition"
+          >
+            Update Quantity
+          </button>
+        </div>
+      )}
+
+      {userData.role === "ADMIN" && (
+        <div className="mt-4 flex items-center w-full">
+          <input
+            type="number"
+            min="0"
+            max="10000"
+            step="1"
+            value={updatedPrices[item._id] || item.price}
+            onChange={(e) =>
+              updatedPrices((prev) => ({
+                ...prev,
+                [item._id]: e.target.value,
+              }))
+            }
+            placeholder="Update Price"
+            className="flex-1 p-2 border border-gray-300 rounded-l"
+          />
+          <button
+            onClick={() => handleUpdatePrice(item._id, updatedPrices[item._id])}
+            className="p-2 ml-2 bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-700 transition"
+          >
+            Update Price
+          </button>
+        </div>
+      )}
+    </div>
+  );
+});
 
 const VegetablesPage = () => {
   const [weights, setWeights] = useState({});
@@ -24,28 +126,32 @@ const VegetablesPage = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const items = useSelector((state) => state.products.items);
-  const cartItems = useSelector((state) => state.cart.items); // Access cart items from Redux
+  const cartItems = useSelector((state) => state.cart.items);
   const loading = useSelector((state) => state.products.loading);
   const error = useSelector((state) => state.products.error);
   const userData = useSelector((state) => state.auth.data);
 
+  // Initialize AOS and fetch items (runs only on category change)
   useEffect(() => {
     AOS.init({
       duration: 1000,
-      once: false,
+      once: true, // Ensure animations happen only once
       mirror: false,
     });
 
+    dispatch(getAllItems(category)).catch(() => {
+      toast.error("Failed to fetch items. Please try again.");
+    });
+  }, [category, dispatch]);
+
+  // Update cart count when cartItems changes
+  useEffect(() => {
     const totalCount = cartItems.reduce(
       (sum, item) => sum + (item.weight > 0 ? 1 : 0),
       0
     );
     setCartCount(totalCount);
-
-    dispatch(getAllItems(category)).catch(() => {
-      toast.error("Failed to fetch items. Please try again.");
-    });
-  }, [category, dispatch, cartItems]);
+  }, [cartItems]);
 
   const handleRoleChange = (e) => {
     const newCategory = e.target.value;
@@ -197,120 +303,21 @@ const VegetablesPage = () => {
             <p className="text-red-500">{error}</p>
           ) : (
             filteredItems.map((item, index) => (
-              <div
-                key={index}
-                className="card bg-white shadow-lg p-4 flex flex-col items-center"
-                data-aos="zoom-in"
-              >
-                <figure className="w-full mb-4">
-                  <img
-                    src={item.img.secure_url}
-                    alt={item.name}
-                    className="w-38 h-32 md:h-48 object-cover hover:scale-125 transition-all ease-in-out duration-300"
-                  />
-                </figure>
-                <h3 className="text-lg font-semibold">{item.name}</h3>
-                <p className="text-sm text-gray-700 mt-2">
-                  Price : ₹{item.price}/
-                  {item.soldInPieces
-                    ? "piece"
-                    : item.soldInDozen
-                    ? "dozen"
-                    : "Kg"}
-                </p>
-
-                <div className="mt-4 flex items-center w-full">
-                  <input
-                    type="number"
-                    min="1"
-                    max="10"
-                    step="0.5"
-                    value={weights[item.name] || ""}
-                    onChange={(e) =>
-                      handleWeightChange(item.name, e.target.value)
-                    }
-                    className="flex-1 p-2 border border-gray-300 rounded-l"
-                  />
-                  <span className="p-2 border border-l-0 border-gray-300 rounded-r">
-                    {item.soldInPieces
-                      ? "piece"
-                      : item.soldInDozen
-                      ? "dozen"
-                      : "Kg"}
-                  </span>
-                </div>
-                {errors[item.name] && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {errors[item.name]}
-                  </p>
-                )}
-
-                <button
-                  onClick={() => handleAddToCart(item.name)}
-                  className="mt-4 bg-[#ffdc00] text-black px-4 py-3 rounded-full hover:bg-[#ffd700] hover:scale-110 transition-all duration-200"
-                >
-                  Add to Cart
-                </button>
-
-                {userData.role === "ADMIN" && (
-                  <div className="mt-4 flex items-center w-full">
-                    <input
-                      type="number"
-                      min="0"
-                      max="1000"
-                      step="1"
-                      value={updatedQuantities[item._id] || item.quantity}
-                      onChange={(e) =>
-                        setUpdatedQuantities((prev) => ({
-                          ...prev,
-                          [item._id]: e.target.value,
-                        }))
-                      }
-                      placeholder="Update Qty"
-                      className="flex-1 p-2 border border-gray-300 rounded-l"
-                    />
-                    <button
-                      onClick={() =>
-                        handleUpdateQuantity(
-                          item._id,
-                          updatedQuantities[item._id]
-                        )
-                      }
-                      className="p-2 ml-2 bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-700 transition"
-                    >
-                      Update Quantity
-                    </button>
-                  </div>
-                )}
-
-                {userData.role === "ADMIN" && (
-                  <div className="mt-4 flex items-center w-full">
-                    <input
-                      type="number"
-                      min="0"
-                      max="10000"
-                      step="1"
-                      value={updatedPrices[item._id] || item.price}
-                      onChange={(e) =>
-                        setUpdatedPrices((prev) => ({
-                          ...prev,
-                          [item._id]: e.target.value,
-                        }))
-                      }
-                      placeholder="Update Price"
-                      className="flex-1 p-2 border border-gray-300 rounded-l"
-                    />
-                    <button
-                      onClick={() =>
-                        handleUpdatePrice(item._id, updatedPrices[item._id])
-                      }
-                      className="p-2 ml-2 bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-700 transition"
-                    >
-                      Update Price
-                    </button>
-                  </div>
-                )}
-              </div>
+              <VegetableCard
+                key={item._id || index} // Use unique key (item._id if available)
+                item={item}
+                weights={weights}
+                errors={errors}
+                userData={userData}
+                updatedQuantities={updatedQuantities}
+                updatedPrices={updatedPrices}
+                handleWeightChange={handleWeightChange}
+                handleAddToCart={handleAddToCart}
+                handleUpdateQuantity={handleUpdateQuantity}
+                handleUpdatePrice={handleUpdatePrice}
+                setUpdatedQuantities={setUpdatedQuantities}
+                setUpdatedPrices={setUpdatedPrices}
+              />
             ))
           )}
         </div>
